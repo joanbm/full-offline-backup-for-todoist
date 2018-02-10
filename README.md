@@ -1,5 +1,7 @@
 # Todoist Utils
 
+[![Build Status](https://travis-ci.org/joanbm/todoist-utils.svg?branch=master)](https://travis-ci.org/joanbm/todoist-utils)
+
 ## download_todoist_backup_attachments.py
 
 ### What does it solve?
