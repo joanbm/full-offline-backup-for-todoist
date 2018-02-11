@@ -1,4 +1,10 @@
 language: python
 python:
   - "3.6"
-script: python -m unittest
+script: coverage run -m unittest
+
+install:
+ - pip install coveralls
+
+after_success:
+    coveralls
