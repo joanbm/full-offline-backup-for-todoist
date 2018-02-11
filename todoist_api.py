@@ -12,9 +12,6 @@ class TodoistBackupInfo:
         self.version = version
         self.url = url
 
-    def __repr__(self):
-        return "%s(%r)" % (self.__class__, self.__dict__)
-
     def get_version_date(self):
         return datetime.datetime.strptime(self.version, "%Y-%m-%d %H:%M")
 

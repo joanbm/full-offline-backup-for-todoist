@@ -8,7 +8,6 @@ class Tracer:
     @abstractmethod
     def trace(self, str):
         """ Trace a simple string """
-        pass
 
 class ConsoleTracer(Tracer):
     """ Implementation of the tracer that traces the strings to the console """
