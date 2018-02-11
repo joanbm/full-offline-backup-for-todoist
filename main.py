@@ -30,4 +30,5 @@ class RuntimeConsoleFrontendDependencyInjector(ConsoleFrontendDependencyInjector
         return self.__todoist_backup_downloader
 
 # Run the actual program
-ConsoleFrontend(RuntimeConsoleFrontendDependencyInjector).run(sys.argv[0], sys.argv[1:])
+if __name__ == "__main__":
+    ConsoleFrontend(RuntimeConsoleFrontendDependencyInjector).run(sys.argv[0], sys.argv[1:])
