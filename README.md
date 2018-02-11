@@ -2,6 +2,8 @@
 
 [![Build Status](https://travis-ci.org/joanbm/todoist-full-offline-backup.svg?branch=master)](https://travis-ci.org/joanbm/todoist-full-offline-backup)
 
+[![Coverage Status](https://coveralls.io/repos/github/joanbm/todoist-full-offline-backup/badge.svg)](https://coveralls.io/github/joanbm/todoist-full-offline-backup)
+
 ## download_todoist_backup_attachments.py
 
 ### What does it solve?
