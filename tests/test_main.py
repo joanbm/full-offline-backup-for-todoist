@@ -1,5 +1,20 @@
-import main
+from main import RuntimeControllerDependencyInjector
 import unittest
 
 class TestMain(unittest.TestCase):
-    pass
+    def test_runtime_dependency_injector_caches_values(self):
+        # Arrange
+
+        # Act
+        runtimedi = RuntimeControllerDependencyInjector("1234", True)
+        tracer1 = runtimedi.tracer
+        tracer2 = runtimedi.tracer
+        todoist_api1 = runtimedi.todoist_api
+        todoist_api2 = runtimedi.todoist_api
+        todoist_backup_downloader1 = runtimedi.todoist_backup_downloader
+        todoist_backup_downloader2 = runtimedi.todoist_backup_downloader
+
+        # Assert
+        self.assertIs(tracer1, tracer2)
+        self.assertIs(todoist_api1, todoist_api2)
+        self.assertIs(todoist_backup_downloader1, todoist_backup_downloader2)

@@ -7,11 +7,12 @@ import re
 class TodoistBackupDownloader:
     """ Class to download Todoist backup ZIPs using the Todoist API """
 
-    def __init__(self, todoist_api, tracer):
-        self.__todoist_api = todoist_api
+    def __init__(self, tracer):
         self.__tracer = tracer
 
-    def __download_backup(self, backup, output_path):
+    def download(self, backup, output_path):
+        """ Downloads the specified backup to the specified folder """
+
         # Sanitize the file name for platforms such as Windows,
         # which don't accept some characters in file names, such as a colon (:)
         self.__tracer.trace("Downloading backup with version '{}'".format(backup.version))
@@ -27,17 +28,3 @@ class TodoistBackupDownloader:
                 sanitized_file_name))
 
         return output_file_path
-
-    def download_latest(self, output_path):
-        """ Downloads the latest (i.e. most recent) Todoist backup ZIP """
-        self.__tracer.trace("Fetching backup list to find the latest backup...")
-        backups = self.__todoist_api.get_backups()
-        backup = max(backups, key=lambda x: x.version_date)
-        return self.__download_backup(backup, output_path)
-
-    def download_version(self, version, output_path):
-        """ Downloads the specified Todoist backup ZIP given by its version string """
-        self.__tracer.trace("Fetching backup list to find the backup '{}'...".format(version))
-        backups = self.__todoist_api.get_backups()
-        backup = next((x for x in backups if x.version == version))
-        return self.__download_backup(backup, output_path)

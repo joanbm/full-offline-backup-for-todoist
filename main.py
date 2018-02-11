@@ -2,20 +2,20 @@
 """ Entry point of the Todoist backup utility """
 
 import sys
-from frontend import ConsoleFrontend, ConsoleFrontendDependencyInjector
+from frontend import ConsoleFrontend
+from controller import Controller, ControllerDependencyInjector
 from todoist_api import TodoistApi
 from todoist_backup_downloader import TodoistBackupDownloader
 from tracer import ConsoleTracer, NullTracer
 
-class RuntimeConsoleFrontendDependencyInjector(ConsoleFrontendDependencyInjector):
+class RuntimeControllerDependencyInjector(ControllerDependencyInjector):
     """ Implementation of the dependency injection container for the actual runtime objects """
 
     def __init__(self, token, verbose):
-        super(RuntimeConsoleFrontendDependencyInjector, self).__init__(token, verbose)
+        super(RuntimeControllerDependencyInjector, self).__init__(token, verbose)
         self.__tracer = ConsoleTracer() if verbose else NullTracer()
         self.__todoist_api = TodoistApi(token, self.__tracer)
-        self.__todoist_backup_downloader = TodoistBackupDownloader(
-            self.__todoist_api, self.__tracer)
+        self.__todoist_backup_downloader = TodoistBackupDownloader(self.__tracer)
 
     @property
     def tracer(self):
@@ -31,4 +31,4 @@ class RuntimeConsoleFrontendDependencyInjector(ConsoleFrontendDependencyInjector
 
 # Run the actual program
 if __name__ == "__main__":
-    ConsoleFrontend(RuntimeConsoleFrontendDependencyInjector).run(sys.argv[0], sys.argv[1:])
+    ConsoleFrontend(Controller, RuntimeControllerDependencyInjector).run(sys.argv[0], sys.argv[1:])
