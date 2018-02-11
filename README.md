@@ -1,6 +1,6 @@
-# Todoist Utils
+# todoist-full-offline-backup
 
-[![Build Status](https://travis-ci.org/joanbm/todoist-utils.svg?branch=master)](https://travis-ci.org/joanbm/todoist-utils)
+[![Build Status](https://travis-ci.org/joanbm/todoist-full-offline-backup.svg?branch=master)](https://travis-ci.org/joanbm/todoist-full-offline-backup)
 
 ## download_todoist_backup_attachments.py
 

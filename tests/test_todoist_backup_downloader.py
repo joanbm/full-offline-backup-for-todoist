@@ -40,10 +40,11 @@ class TestTodoistApi(unittest.TestCase):
         expected_dstpath = os.path.join(self.__test_dir, "2016-01-01 12_30.zip")
 
         # Act
-        backup_downloader.download_version("2016-01-01 12:30", self.__test_dir)
+        dstpath = backup_downloader.download_version("2016-01-01 12:30", self.__test_dir)
 
         # Assert
-        self.assertEqual(Path(expected_dstpath).read_text(), "input1")
+        self.assertEqual(dstpath, expected_dstpath)
+        self.assertEqual(Path(dstpath).read_text(), "input1")
 
     def test_on_latest_version_downloads_file_with_sanitized_filename(self):
         # Arrange
@@ -52,9 +53,10 @@ class TestTodoistApi(unittest.TestCase):
         expected_dstpath = os.path.join(self.__test_dir, "2016-01-02 14_56.zip")
 
         # Act
-        backup_downloader.download_latest(self.__test_dir)
+        dstpath = backup_downloader.download_latest(self.__test_dir)
 
         # Assert
+        self.assertEqual(dstpath, expected_dstpath)
         self.assertEqual(Path(expected_dstpath).read_text(), "input2")
 
     def test_on_latest_version_and_existing_destionation_doesnt_overwrite(self):
@@ -62,10 +64,11 @@ class TestTodoistApi(unittest.TestCase):
         backup_downloader = TodoistBackupDownloader(
             Mock(get_backups=lambda: self.__test_data), NullTracer())
         expected_dstpath = os.path.join(self.__test_dir, "2016-01-02 14_56.zip")
+        Path(expected_dstpath).write_text("i am untouchable")
 
         # Act
-        Path(expected_dstpath).write_text("i am untouchable")
-        backup_downloader.download_latest(self.__test_dir)
+        dstpath = backup_downloader.download_latest(self.__test_dir)
 
         # Assert
+        self.assertEqual(dstpath, expected_dstpath)
         self.assertEqual(Path(expected_dstpath).read_text(), "i am untouchable")
