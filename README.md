@@ -16,6 +16,8 @@ Furthermore, Todoist has a **backup functionality**, which allows exporting the 
 
 Unfortunately, the two don't mix: **The backup functionality doesn't back up any of the attachments assigned to tasks**. Instead, only an URL to download the attachments is included in the backup, which isn't useful or ideal for most scenarios.
 
+This tool aims to allow you to make a complete backup, including all attachments, so you can easily keep all your task data secure on your own computer.
+
 ## Full feature list
 
 * Can downloads the backups from Todoist's servers through the Todoist API
