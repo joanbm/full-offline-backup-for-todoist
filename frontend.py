@@ -17,6 +17,7 @@ class ConsoleFrontend:
             epilog=example1_str + '\r\n' + example2_str)
         parser.add_argument("--verbose", action="store_true", help="print details to console")
         subparsers = parser.add_subparsers(dest='action')
+        subparsers.required = True
 
         # create the parser for the "list" command
         parser_list = subparsers.add_parser('list', help='list available backups')
@@ -39,8 +40,7 @@ class ConsoleFrontend:
     def run(self, prog, arguments):
         """ Runs the Todoist backup tool frontend with the specified command line arguments """
         args = self.__parse_command_line_args(prog, arguments)
-        if hasattr(args, "func"):
-            args.func(args)
+        args.func(args)
 
     def handle_list(self, args):
         """ Handles the list subparser with the specified command line arguments """
