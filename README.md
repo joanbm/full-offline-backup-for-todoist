@@ -20,15 +20,15 @@ This tool aims to allow you to make a complete backup, including all attachments
 
 ## Full feature list
 
-* Can downloads the backups from Todoist's servers through the Todoist API
+* Can downloads the backups from Todoist's servers through the Todoist API.
 
-* Can download all attachments of the tasks associated to your Todoist backup
+* Can download all attachments of the tasks associated to your Todoist backup.
 
 * Automatically fixes Todoist backup ZIPs when you have projects that contain non-ASCII characters (i.e. Unicode characters like 💓) so they can be correctly handled by ZIP tools.
 
-* Can list all available backups through the Todoist API
+* Can list all available backups through the Todoist API.
 
-* Can be easily automated to download your backups periodically
+* Can be easily automated to download your backups periodically.
 
 ## Status
 
@@ -42,23 +42,23 @@ Early version - enough for basic use, but not tested under every possible scenar
 
 Download latest backup from Todoist's servers, including attachments:
 
-``python3 main.py download LATEST --with-attachments --token 0123456789abcdef``
+``python3 __main__.py download LATEST --with-attachments --token 0123456789abcdef``
 
 Download a specific backup from Todoist's servers, without including attachments:
 
-``python3 main.py download "2018-02-16 06:46" --token 0123456789abcdef``
+``python3 __main__.py download "2018-02-16 06:46" --token 0123456789abcdef``
 
 Download a specific backup from Todoist's servers, including attachments, and with tracing/progress info:
 
-``python3 main.py --verbose download "2018-02-16 06:46" --token 0123456789abcdef``
+``python3 __main__.py --verbose download "2018-02-16 06:46" --token 0123456789abcdef``
 
 List available backups:
 
-``python3 main.py list --token 0123456789abcdef``
+``python3 __main__.py list --token 0123456789abcdef``
 
 Print full help:
 
-``python3 main.py -h``
+``python3 __main__.py -h``
 
 **IMPORTANT:** To use this tool you will need to replace the "0123456789abcdef" string above with your Todoist API token.
 
