@@ -1,4 +1,4 @@
-from main import RuntimeControllerDependencyInjector
+from runtime import RuntimeControllerDependencyInjector
 import unittest
 
 class TestMain(unittest.TestCase):
