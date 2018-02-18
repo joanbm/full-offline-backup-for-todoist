@@ -47,12 +47,15 @@ class TodoistBackupAttachmentsDownloader:
     def __fetch_attachment_infos_from_zip(self, zip_file):
         """ Fetches the information of all the attachment_infos
             of the current Todoist backup ZIP file """
-        tracer.trace("Reading ZIP file...")
+        self.__tracer.trace("Reading ZIP file...")
 
         attachment_infos = []
 
-        for name in zip_file.namelist():
-            tracer.trace("Parsing CSV file '{}'...".format(name))
+        # We iterate over the sorted file name list, so the resulting list
+        # is always in a consistent order independently of quirks
+        # in the ZIP format
+        for name in sorted(zip_file.namelist()):
+            self.__tracer.trace("Parsing CSV file '{}'...".format(name))
             csv_string = zip_file.read(name).decode('utf-8-sig')
             attachment_infos.extend(self.__fetch_attachment_infos_from_csv(csv_string))
 
@@ -76,7 +79,7 @@ class TodoistBackupAttachmentsDownloader:
             if attachment_info.file_name in included_attachment_names:
                 new_file_name = self.__deduplicate_file_name(
                     attachment_info.file_name, included_attachment_names)
-                tracer.trace("Duplicate attachment name found - Renaming {} to {}...".format(
+                self.__tracer.trace("Duplicate attachment name found - Renaming {} to {}...".format(
                     attachment_info.file_name, new_file_name))
                 attachment_info.file_name = new_file_name
 
@@ -86,15 +89,16 @@ class TodoistBackupAttachmentsDownloader:
         """ Downloads and packs the given attachments in a folder 'attachments'
             of the current Todoist backup ZIP file """
         for idx, attachment_info in enumerate(attachment_infos):
-            tracer.trace ("[{}/{}] Downloading attachment '{}'... ".format(
-                idx+1, len(attachment_infos), attachment_info.file_name), end="", flush=True)
+            self.__tracer.trace ("[{}/{}] Downloading attachment '{}'... ".format(
+                idx+1, len(attachment_infos), attachment_info.file_name))
                 
             response = urllib.request.urlopen(attachment_info.file_url)
             data = response.read()
 
             zip_file.writestr(self.__ATTACHMENT_FOLDER + attachment_info.file_name, data)
 
-            tracer.trace("Done")
+            self.__tracer.trace ("[{}/{}] Downloaded attachment '{}'... ".format(
+                idx+1, len(attachment_infos), attachment_info.file_name))
 
     def download_attachments(self, zip_file_path):
         """ Downloads all the attachments of the current Todoist backup ZIP file
@@ -103,11 +107,11 @@ class TodoistBackupAttachmentsDownloader:
         with zipfile.ZipFile(zip_file_path, 'a') as zip_file:
             # Ensure that we haven't already processed this file...
             if any(name.startswith(self.__ATTACHMENT_FOLDER) for name in zip_file.namelist()):
-                tracer.trace("File already has attachments folder, skipping.")
+                self.__tracer.trace("File already has attachments folder, skipping.")
                 return
 
             # Fetch the information of all the attachments
             attachment_infos = self.__fetch_attachment_infos_from_zip(zip_file)
-            tracer.trace("Found {} attachments.".format(len(attachment_infos)))
+            self.__tracer.trace("Found {} attachments.".format(len(attachment_infos)))
             self.__deduplicate_attachments_names(attachment_infos)
             self.__download_and_pack_attachments(attachment_infos, zip_file)
