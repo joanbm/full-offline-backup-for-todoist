@@ -6,6 +6,7 @@ from frontend import ConsoleFrontend
 from controller import Controller, ControllerDependencyInjector
 from todoist_api import TodoistApi
 from todoist_backup_downloader import TodoistBackupDownloader
+from todoist_backup_attachments_downloader import TodoistBackupAttachmentsDownloader
 from tracer import ConsoleTracer, NullTracer
 
 class RuntimeControllerDependencyInjector(ControllerDependencyInjector):
@@ -16,6 +17,7 @@ class RuntimeControllerDependencyInjector(ControllerDependencyInjector):
         self.__tracer = ConsoleTracer() if verbose else NullTracer()
         self.__todoist_api = TodoistApi(token, self.__tracer)
         self.__todoist_backup_downloader = TodoistBackupDownloader(self.__tracer)
+        self.__todoist_backup_attachments_downloader = TodoistBackupAttachmentsDownloader(self.__tracer)
 
     @property
     def tracer(self):
@@ -28,6 +30,10 @@ class RuntimeControllerDependencyInjector(ControllerDependencyInjector):
     @property
     def todoist_backup_downloader(self):
         return self.__todoist_backup_downloader
+
+    @property
+    def todoist_backup_attachments_downloader(self):
+        return self.__todoist_backup_attachments_downloader
 
 # Run the actual program
 if __name__ == "__main__":

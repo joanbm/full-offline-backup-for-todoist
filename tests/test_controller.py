@@ -1,5 +1,5 @@
 import unittest
-from unittest.mock import Mock
+from unittest.mock import Mock, ANY
 from todoist_api import TodoistBackupInfo
 from tracer import NullTracer
 from controller import ControllerDependencyInjector, Controller, BackupNotFoundException
@@ -7,10 +7,13 @@ from controller import ControllerDependencyInjector, Controller, BackupNotFoundE
 class TestControllerDependencyInjector(ControllerDependencyInjector):
     """ Rudimentary dependency injection container for the tests """
 
-    def __init__(self, test_tracer, test_todoist_api, test_todoist_downloader):
+    def __init__(self, test_tracer, test_todoist_api, test_todoist_downloader,
+        test_todoist_attachments_downloader):
+        super(TestControllerDependencyInjector, self).__init__("", False)
         self.__test_tracer = test_tracer
         self.__test_todoist_api = test_todoist_api
         self.__test_todoist_downloader = test_todoist_downloader
+        self.__test_todoist_attachments_downloader = test_todoist_attachments_downloader
 
     @property
     def tracer(self):
@@ -24,6 +27,10 @@ class TestControllerDependencyInjector(ControllerDependencyInjector):
     def todoist_backup_downloader(self):
         return self.__test_todoist_downloader
 
+    @property
+    def todoist_backup_attachments_downloader(self):
+        return self.__test_todoist_attachments_downloader
+
 class TestController(unittest.TestCase):
     def setUp(self):
         # Create sample test data
@@ -34,7 +41,7 @@ class TestController(unittest.TestCase):
     def test_on_get_backups_returns_correct_list_and_latest_backup(self):
         # Arrange
         controllerdi = TestControllerDependencyInjector(
-            NullTracer(), Mock(get_backups=lambda: self.__test_data), Mock())
+            NullTracer(), Mock(get_backups=lambda: self.__test_data), Mock(), Mock())
         controllerinst = Controller(controllerdi)
 
         # Act
@@ -48,7 +55,7 @@ class TestController(unittest.TestCase):
         # Arrange
         downloader_mock = Mock()
         controllerdi = TestControllerDependencyInjector(
-            NullTracer(), Mock(get_backups=lambda: []), downloader_mock)
+            NullTracer(), Mock(get_backups=lambda: []), downloader_mock, Mock())
         controllerinst = Controller(controllerdi)
 
         # Act
@@ -61,43 +68,70 @@ class TestController(unittest.TestCase):
     def test_on_nonexisting_version_throws_exception(self):
         # Arrange
         controllerdi = TestControllerDependencyInjector(
-            NullTracer(), Mock(get_backups=lambda: self.__test_data), Mock())
+            NullTracer(), Mock(get_backups=lambda: self.__test_data), Mock(), Mock())
         controllerinst = Controller(controllerdi)
 
         # Act/Assert
-        self.assertRaises(BackupNotFoundException, controllerinst.download_version, "2016-01-03 11:22", "/")
+        self.assertRaises(BackupNotFoundException, controllerinst.download_version,
+            "2016-01-03 11:22", "/", with_attachments=False)
 
     def test_on_existing_version_calls_download_for_that_version(self):
         # Arrange
         downloader_mock = Mock()
         controllerdi = TestControllerDependencyInjector(
-            NullTracer(), Mock(get_backups=lambda: self.__test_data), downloader_mock)
+            NullTracer(), Mock(get_backups=lambda: self.__test_data), downloader_mock, Mock())
         controllerinst = Controller(controllerdi)
 
         # Act
-        controllerinst.download_version(self.__old_backup.version, ".")
+        controllerinst.download_version(self.__old_backup.version, ".", with_attachments=False)
 
         # Assert
         downloader_mock.download.assert_called_with(self.__old_backup, ".")
 
+    def test_on_existing_version_with_attachments_calls_download_attachments(self):
+        # Arrange
+        downloader_attachments_mock = Mock()
+        controllerdi = TestControllerDependencyInjector(
+            NullTracer(), Mock(get_backups=lambda: self.__test_data), Mock(), downloader_attachments_mock)
+        controllerinst = Controller(controllerdi)
+
+        # Act
+        controllerinst.download_version(self.__old_backup.version, ".", with_attachments=True)
+
+        # Assert
+        downloader_attachments_mock.download_attachments.assert_called_with(ANY)
+
     def test_on_nonexisting_latest_throws_exception(self):
         # Arrange
         controllerdi = TestControllerDependencyInjector(
-            NullTracer(), Mock(get_backups=lambda: []), Mock())
+            NullTracer(), Mock(get_backups=lambda: []), Mock(), Mock())
         controllerinst = Controller(controllerdi)
 
         # Act/Assert
-        self.assertRaises(BackupNotFoundException, controllerinst.download_latest, "/")
+        self.assertRaises(BackupNotFoundException, controllerinst.download_latest, "/", with_attachments=False)
 
     def test_on_latest_version_calls_download_for_that_version(self):
         # Arrange
         downloader_mock = Mock()
         controllerdi = TestControllerDependencyInjector(
-            NullTracer(), Mock(get_backups=lambda: self.__test_data), downloader_mock)
+            NullTracer(), Mock(get_backups=lambda: self.__test_data), downloader_mock, Mock())
         controllerinst = Controller(controllerdi)
 
         # Act
-        controllerinst.download_latest(".")
+        controllerinst.download_latest(".", with_attachments=False)
 
         # Assert
         downloader_mock.download.assert_called_with(self.__latest_backup, ".")
+
+    def test_on_latest_version_with_attachments_calls_download_attachments(self):
+        # Arrange
+        downloader_attachments_mock = Mock()
+        controllerdi = TestControllerDependencyInjector(
+            NullTracer(), Mock(get_backups=lambda: self.__test_data), Mock(), downloader_attachments_mock)
+        controllerinst = Controller(controllerdi)
+
+        # Act
+        controllerinst.download_latest(".", with_attachments=True)
+
+        # Assert
+        downloader_attachments_mock.download_attachments.assert_called_with(ANY)

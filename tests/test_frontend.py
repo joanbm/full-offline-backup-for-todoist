@@ -16,12 +16,12 @@ class TestFrontend(unittest.TestCase):
             frontend = ConsoleFrontend(Mock(return_value=controller), Mock())
 
             # Act
-            frontend.run("util", ["--token", "1234", "--list"])
+            frontend.run("util", ["list", "--token", "1234"])
 
             # Assert
             self.assertRegex(mock_stdout.getvalue(), "BACKUP1")
             self.assertRegex(mock_stdout.getvalue(), "file:///test1.zip")
-            self.assertRegex(mock_stdout.getvalue(), r"BACKUP2 \(latest\)")
+            self.assertRegex(mock_stdout.getvalue(), r"BACKUP2 \(LATEST\)")
             self.assertRegex(mock_stdout.getvalue(), "file:///test2.zip")
 
     def test_on_download_version_calls_controller_with_that_version(self):
@@ -30,10 +30,10 @@ class TestFrontend(unittest.TestCase):
         frontend = ConsoleFrontend(Mock(return_value=controller), Mock())
 
         # Act
-        frontend.run("util", ["--token", "1234", "--download-version", "4321"])
+        frontend.run("util", ["download", "4321", "--token", "1234"])
 
         # Assert
-        controller.download_version.assert_called_with("4321", ANY)
+        controller.download_version.assert_called_with("4321", ANY, with_attachments=False)
 
     def test_on_download_latest_version_calls_controller_latest_version(self):
         # Arrange
@@ -41,7 +41,7 @@ class TestFrontend(unittest.TestCase):
         frontend = ConsoleFrontend(Mock(return_value=controller), Mock())
 
         # Act
-        frontend.run("util", ["--token", "1234", "--download-latest"])
+        frontend.run("util", ["download", "LATEST", "--token", "1234"])
 
         # Assert
-        controller.download_latest.assert_called_with(ANY)
+        controller.download_latest.assert_called_with(ANY, with_attachments=False)
