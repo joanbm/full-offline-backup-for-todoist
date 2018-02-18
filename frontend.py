@@ -39,7 +39,8 @@ class ConsoleFrontend:
     def run(self, prog, arguments):
         """ Runs the Todoist backup tool frontend with the specified command line arguments """
         args = self.__parse_command_line_args(prog, arguments)
-        args.func(args)
+        if hasattr(args, "func"):
+            args.func(args)
 
     def handle_list(self, args):
         """ Handles the list subparser with the specified command line arguments """
