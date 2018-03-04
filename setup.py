@@ -10,6 +10,7 @@ setup(
     license="GPLv3",
     keywords="todoist online backup attachments local full whole files",
     url="https://github.com/joanbm/todoist-full-offline-backup",
+    scripts = ['bin/todoist-full-offline-backup'],
     project_urls={
         "Bug Tracker": "https://github.com/joanbm/todoist-full-offline-backup/issues",
         "Source Code": "https://github.com/joanbm/todoist-full-offline-backup",

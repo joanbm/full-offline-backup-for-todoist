@@ -1,9 +1,4 @@
-__pycache__
-.coverage
-htmlcov
-
 todoist-full-offline-backup.zip
 todoist_full_offline_backup.egg-info
+build
 dist
-
-*.zip

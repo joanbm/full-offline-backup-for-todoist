@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import patch
 import io
-from tracer import NullTracer, ConsoleTracer
+from .tracer import NullTracer, ConsoleTracer
 
 class TestTracer(unittest.TestCase):
     def test_console_tracer_traces_to_console(self):

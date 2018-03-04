@@ -1,8 +1,8 @@
-from frontend import ConsoleFrontend
 import unittest
 from unittest.mock import Mock, MagicMock, patch, ANY
 import io
-from todoist_api import TodoistBackupInfo
+from .frontend import ConsoleFrontend
+from .todoist_api import TodoistBackupInfo
 
 class TestFrontend(unittest.TestCase):
     def test_on_list_backups_prints_list_to_console(self):

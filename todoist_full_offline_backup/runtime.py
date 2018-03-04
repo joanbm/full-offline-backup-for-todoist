@@ -1,11 +1,11 @@
 #!/usr/bin/python3
 """ Implementation of the dependency injection container for the actual runtime objects """
 
-from controller import ControllerDependencyInjector
-from todoist_api import TodoistApi
-from todoist_backup_downloader import TodoistBackupDownloader
-from todoist_backup_attachments_downloader import TodoistBackupAttachmentsDownloader
-from tracer import ConsoleTracer, NullTracer
+from .controller import ControllerDependencyInjector
+from .todoist_api import TodoistApi
+from .todoist_backup_downloader import TodoistBackupDownloader
+from .todoist_backup_attachments_downloader import TodoistBackupAttachmentsDownloader
+from .tracer import ConsoleTracer, NullTracer
 
 class RuntimeControllerDependencyInjector(ControllerDependencyInjector):
     """ Implementation of the dependency injection container for the actual runtime objects """
