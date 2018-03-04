@@ -1,8 +1,8 @@
 import unittest
 from unittest.mock import Mock, ANY
-from .todoist_api import TodoistBackupInfo
-from .tracer import NullTracer
-from .controller import ControllerDependencyInjector, Controller, BackupNotFoundException
+from ..todoist_api import TodoistBackupInfo
+from ..tracer import NullTracer
+from ..controller import ControllerDependencyInjector, Controller, BackupNotFoundException
 
 class TestControllerDependencyInjector(ControllerDependencyInjector):
     """ Rudimentary dependency injection container for the tests """

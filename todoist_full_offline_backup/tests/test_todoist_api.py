@@ -1,8 +1,8 @@
 import unittest
 import datetime
 from unittest.mock import patch, Mock, ANY
-from todoist_api import TodoistApi
-from tracer import NullTracer
+from ..todoist_api import TodoistApi
+from ..tracer import NullTracer
 
 class TestTodoistApi(unittest.TestCase):
     def test_on_empty_json_returns_empty_list(self):

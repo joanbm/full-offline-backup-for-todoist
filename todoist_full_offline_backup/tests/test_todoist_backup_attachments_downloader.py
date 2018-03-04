@@ -8,9 +8,9 @@ import zipfile
 import json
 import hashlib
 from pathlib import Path
-from .todoist_api import TodoistBackupInfo
-from .todoist_backup_attachments_downloader import TodoistBackupAttachmentsDownloader
-from .tracer import NullTracer, ConsoleTracer
+from ..todoist_api import TodoistBackupInfo
+from ..todoist_backup_attachments_downloader import TodoistBackupAttachmentsDownloader
+from ..tracer import NullTracer, ConsoleTracer
 
 class TestTodoistBackupAttachmentsDownloader(unittest.TestCase):
     def setUp(self):

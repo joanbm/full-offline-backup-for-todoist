@@ -1,5 +1,5 @@
 import unittest
-from .runtime import RuntimeControllerDependencyInjector
+from ..runtime import RuntimeControllerDependencyInjector
 
 class TestMain(unittest.TestCase):
     def test_runtime_dependency_injector_caches_values(self):

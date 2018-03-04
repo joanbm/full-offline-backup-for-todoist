@@ -2,3 +2,4 @@ todoist-full-offline-backup.zip
 todoist_full_offline_backup.egg-info
 build
 dist
+.coverage

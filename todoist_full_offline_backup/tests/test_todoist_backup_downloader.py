@@ -4,9 +4,9 @@ import shutil
 import os
 import zipfile
 from pathlib import Path
-from .todoist_api import TodoistBackupInfo
-from .todoist_backup_downloader import TodoistBackupDownloader
-from .tracer import NullTracer
+from ..todoist_api import TodoistBackupInfo
+from ..todoist_backup_downloader import TodoistBackupDownloader
+from ..tracer import NullTracer
 
 class TestTodoistApi(unittest.TestCase):
     def setUp(self):
