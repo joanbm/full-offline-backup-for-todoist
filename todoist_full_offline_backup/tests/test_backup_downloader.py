@@ -44,7 +44,7 @@ class TestBackupAttachmentsDownloader(unittest.TestCase):
 
         # Arrange
         backup_downloader = TodoistBackupDownloader(NullTracer())
-        expected_dstpath = os.path.join(self.__test_dir, "2016-01-01 12_30.zip")
+        expected_dstpath = os.path.join(self.__test_dir, "TodoistBackup_2016-01-01 12_30.zip")
 
         # Act
         dstpath = backup_downloader.download(self.__backup, self.__test_dir)
@@ -59,7 +59,7 @@ class TestBackupAttachmentsDownloader(unittest.TestCase):
 
         # Arrange
         backup_downloader = TodoistBackupDownloader(NullTracer())
-        expected_dstpath = os.path.join(self.__test_dir, "2016-01-01 12_30.zip")
+        expected_dstpath = os.path.join(self.__test_dir, "TodoistBackup_2016-01-01 12_30.zip")
 
         with zipfile.ZipFile(expected_dstpath, "w") as zip_file:
             zip_file.writestr("dummy.txt", "dummy data for the test MD5")
