@@ -1,10 +1,10 @@
 language: python
 python:
   - "3.6"
-script: coverage run -m unittest
+script: "pylint --errors-only && coverage run -m unittest"
 
 install:
- - pip install coveralls
+ - pip install pylint coveralls
 
 after_success:
     coveralls
