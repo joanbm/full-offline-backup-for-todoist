@@ -9,6 +9,7 @@ import json
 import urllib.request
 import itertools
 import os
+from .utils import sanitize_file_name
 
 class TodoistAttachmentInfo:
     """ Represents the properties of a Todoist attachment """
@@ -30,7 +31,8 @@ class TodoistBackupAttachmentsDownloader:
         """ Fetches the information of an attachment of a Todoist backup CSV file,
             given the JSON content of a task with an attachment """
         json_data = json.loads(json_str)
-        return TodoistAttachmentInfo(json_data["file_name"], json_data["file_url"])
+        return TodoistAttachmentInfo(sanitize_file_name(json_data["file_name"]),
+                                     json_data["file_url"])
 
     def __fetch_attachment_infos_from_csv(self, csv_string):
         """ Fetches the information of all the attachments of a Todoist backup CSV file,

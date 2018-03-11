@@ -40,6 +40,33 @@ class TestTodoistBackupAttachmentsDownloader(unittest.TestCase):
             writer.writerow(["task", "This is a random task", "4"])
             writer.writerow(["note", " [[file {}]]".format(json.dumps({
                 "file_type": "image/png",
+                "file_name": "this/is/an/image.png",
+                "file_url": "file://" + self.__attached_image_path
+            })), "test"])
+            zip_file.writestr("My Test [123456789].csv", output.getvalue())
+
+        backup_downloader = TodoistBackupAttachmentsDownloader(NullTracer())
+
+        # Act
+        backup_downloader.download_attachments(self.__zip_path)
+
+        # Assert
+        with zipfile.ZipFile(self.__zip_path, 'r') as zip_file:
+            self.assertIn("attachments/this_is_an_image.png", zip_file.namelist())
+            self.assertEqual(zip_file.read("attachments/this_is_an_image.png").decode('utf-8'),
+                             "it's a PNG")
+
+    def test_filename_with_slash_is_sanitized(self):
+        """ Tests that a filename containing a slash in sanitized before ZIPing it
+            (instead of failing or creating a subdirectory inside the ZIP file) """
+        # Arrange
+        with zipfile.ZipFile(self.__zip_path, 'w') as zip_file:
+            output = io.StringIO()
+            writer = csv.writer(output, quoting=csv.QUOTE_NONNUMERIC)
+            writer.writerow(["TYPE", "CONTENT", "PRIORITY"])
+            writer.writerow(["task", "This is a random task", "4"])
+            writer.writerow(["note", " [[file {}]]".format(json.dumps({
+                "file_type": "image/png",
                 "file_name": "image.png",
                 "file_url": "file://" + self.__attached_image_path
             })), "test"])

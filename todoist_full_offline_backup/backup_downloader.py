@@ -3,9 +3,9 @@
 import os
 import urllib.request
 import zipfile
-import re
 from pathlib import Path
 import struct
+from .utils import sanitize_file_name
 
 class TodoistBackupDownloader:
     """ Class to download Todoist backup ZIPs using the Todoist API """
@@ -77,7 +77,7 @@ class TodoistBackupDownloader:
         # Sanitize the file name for platforms such as Windows,
         # which don't accept some characters in file names, such as a colon (:)
         self.__tracer.trace("Downloading backup with version '{}'".format(backup.version))
-        sanitized_file_name = re.sub(r'[^a-zA-Z0-9_\- ]', "_", backup.version) + ".zip"
+        sanitized_file_name = sanitize_file_name(backup.version + ".zip")
         output_file_path = os.path.join(output_path, sanitized_file_name)
 
         # Download the file

@@ -3,3 +3,5 @@ todoist_full_offline_backup.egg-info
 build
 dist
 .coverage
+htmlcov
+*.zip
