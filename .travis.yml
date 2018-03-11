@@ -1,7 +1,7 @@
 language: python
 python:
   - "3.6"
-script: "pylint --errors-only && coverage run -m unittest"
+script: "pylint --errors-only todoist_full_offline_backup && coverage run -m unittest"
 
 install:
  - pip install pylint coveralls
