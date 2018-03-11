@@ -1,3 +1,6 @@
+#!/usr/bin/python3
+""" Tests for the console frontend """
+# pylint: disable=invalid-name
 import unittest
 from unittest.mock import Mock, MagicMock, patch, ANY
 import io
@@ -5,7 +8,10 @@ from ..frontend import ConsoleFrontend
 from ..todoist_api import TodoistBackupInfo
 
 class TestFrontend(unittest.TestCase):
+    """ Tests for the console frontend """
+
     def test_on_list_backups_prints_list_to_console(self):
+        """ Tests that the list backups operation prints the list of backups to the console """
         # Arrange
         with patch('sys.stdout', new_callable=io.StringIO) as mock_stdout:
             backup1 = TodoistBackupInfo("BACKUP1", "file:///test1.zip")
@@ -24,7 +30,11 @@ class TestFrontend(unittest.TestCase):
             self.assertRegex(mock_stdout.getvalue(), r"BACKUP2 \(LATEST\)")
             self.assertRegex(mock_stdout.getvalue(), "file:///test2.zip")
 
-    def test_on_download_version_calls_controller_with_that_version(self):
+    @staticmethod
+    def test_on_download_version_calls_controller_with_that_version():
+        """ Tests that when attempting to download an specific version of a backup,
+            the corresponding method of the controller is called """
+
         # Arrange
         controller = MagicMock()
         frontend = ConsoleFrontend(Mock(return_value=controller), Mock())
@@ -35,7 +45,10 @@ class TestFrontend(unittest.TestCase):
         # Assert
         controller.download_version.assert_called_with("4321", ANY, with_attachments=False)
 
-    def test_on_download_latest_version_calls_controller_latest_version(self):
+    @staticmethod
+    def test_on_download_latest_version_calls_controller_latest_version():
+        """ Tests that when attempting to download the latest backup,
+            the corresponding method of the controller is called """
         # Arrange
         controller = MagicMock()
         frontend = ConsoleFrontend(Mock(return_value=controller), Mock())

@@ -14,7 +14,7 @@ class ConsoleFrontend:
         example1_str = "Example: {} download LATEST --token 0123456789abcdef".format(prog)
         example2_str = "         {} --verbose list --token 0123456789abcdef".format(prog)
         parser = argparse.ArgumentParser(prog=prog, formatter_class=argparse.RawTextHelpFormatter,
-            epilog=example1_str + '\r\n' + example2_str)
+                                         epilog=example1_str + '\r\n' + example2_str)
         parser.add_argument("--verbose", action="store_true", help="print details to console")
         subparsers = parser.add_subparsers(dest='action')
         subparsers.required = True
@@ -31,10 +31,10 @@ class ConsoleFrontend:
         parser_download.add_argument("version", type=str, metavar="VERSIONSPEC|LATEST",
                                      help="backup version to download, or LATEST")
         parser_download.add_argument("--with-attachments", action="store_true",
-                                 help="download attachments and attach to the backup file")
+                                     help="download attachments and attach to the backup file")
         parser_download.add_argument("--token", type=str, required=True,
                                      help="todoist API token (see Settings --> Integration)")
-                                     
+
         return parser.parse_args(arguments)
 
     def run(self, prog, arguments):
@@ -47,7 +47,7 @@ class ConsoleFrontend:
         # Configure controller
         dependencies = self.__controller_dependencies_factory(args.token, args.verbose)
         controller = self.__controller_factory(dependencies)
-        
+
         # Execute requested action
         (backups, latest_backup) = controller.get_backups()
         print("{:<30} | {}".format("VERSION", "URL"))

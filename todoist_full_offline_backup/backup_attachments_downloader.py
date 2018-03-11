@@ -25,7 +25,8 @@ class TodoistBackupAttachmentsDownloader:
     def __init__(self, tracer):
         self.__tracer = tracer
 
-    def __fetch_attachment_info_from_json(self, json_str):
+    @staticmethod
+    def __fetch_attachment_info_from_json(json_str):
         """ Fetches the information of an attachment of a Todoist backup CSV file,
             given the JSON content of a task with an attachment """
         json_data = json.loads(json_str)
@@ -61,7 +62,8 @@ class TodoistBackupAttachmentsDownloader:
 
         return attachment_infos
 
-    def __deduplicate_file_name(self, original_file_name, file_names_to_avoid):
+    @staticmethod
+    def __deduplicate_file_name(original_file_name, file_names_to_avoid):
         """ Modifies the given file name in order to avoid all of the file names
            in the given list of file names to avoid """
         name_without_ext, ext = os.path.splitext(original_file_name)
@@ -69,6 +71,8 @@ class TodoistBackupAttachmentsDownloader:
             new_file_name = name_without_ext + "_" + str(i) + ext
             if new_file_name not in file_names_to_avoid:
                 return new_file_name
+
+        raise Exception('Unreachable code')
 
     def __deduplicate_attachments_names(self, attachment_infos):
         """ Modifies the attachment names, if necessary, in order to
@@ -89,15 +93,15 @@ class TodoistBackupAttachmentsDownloader:
         """ Downloads and packs the given attachments in a folder 'attachments'
             of the current Todoist backup ZIP file """
         for idx, attachment_info in enumerate(attachment_infos):
-            self.__tracer.trace ("[{}/{}] Downloading attachment '{}'... ".format(
+            self.__tracer.trace("[{}/{}] Downloading attachment '{}'... ".format(
                 idx+1, len(attachment_infos), attachment_info.file_name))
-                
+
             response = urllib.request.urlopen(attachment_info.file_url)
             data = response.read()
 
             zip_file.writestr(self.__ATTACHMENT_FOLDER + attachment_info.file_name, data)
 
-            self.__tracer.trace ("[{}/{}] Downloaded attachment '{}'... ".format(
+            self.__tracer.trace("[{}/{}] Downloaded attachment '{}'... ".format(
                 idx+1, len(attachment_infos), attachment_info.file_name))
 
     def download_attachments(self, zip_file_path):

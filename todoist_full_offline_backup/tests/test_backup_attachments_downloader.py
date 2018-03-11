@@ -1,3 +1,6 @@
+#!/usr/bin/python3
+""" Tests for the Todoist backup + attachments downloader class """
+# pylint: disable=invalid-name
 import unittest
 import tempfile
 import shutil
@@ -8,13 +11,14 @@ import zipfile
 import json
 import hashlib
 from pathlib import Path
-from ..todoist_api import TodoistBackupInfo
-from ..todoist_backup_attachments_downloader import TodoistBackupAttachmentsDownloader
-from ..tracer import NullTracer, ConsoleTracer
+from ..backup_attachments_downloader import TodoistBackupAttachmentsDownloader
+from ..tracer import NullTracer
 
 class TestTodoistBackupAttachmentsDownloader(unittest.TestCase):
+    """ Tests for the Todoist backup + attachments downloader class """
+
     def setUp(self):
-        # Create sample filesystem structure
+        """ Creates the sample filesystem structure for the test """
         self.__test_dir = tempfile.mkdtemp()
         self.__attached_image_path = os.path.join(self.__test_dir, "image.jpg")
         self.__attached_file_path = os.path.join(self.__test_dir, "file.ini")
@@ -23,10 +27,11 @@ class TestTodoistBackupAttachmentsDownloader(unittest.TestCase):
         self.__zip_path = os.path.join(self.__test_dir, "input1.zip")
 
     def tearDown(self):
-        # Destroy sample filesystem structure
+        """ Destroys the sample filesystem structure for the test """
         shutil.rmtree(self.__test_dir)
 
     def test_on_simple_download_downloads_attachments(self):
+        """ Does a basic test with valid data to ensure attachments are downloaded """
         # Arrange
         with zipfile.ZipFile(self.__zip_path, 'w') as zip_file:
             output = io.StringIO()
@@ -60,7 +65,9 @@ class TestTodoistBackupAttachmentsDownloader(unittest.TestCase):
             self.assertEqual(zip_file.read("attachments/image.png").decode('utf-8'), "it's a PNG")
             self.assertEqual(zip_file.read("attachments/file.ini").decode('utf-8'), "it's a INI")
 
-    def test_on_download_with_already_downloaded_does_nothing(self):
+    def test_on_download_with_already_downloaded_doesnt_overwrite(self):
+        """ Does a test where an attachment has already been downloaded,
+            to ensure it is not downloaded again """
         # Arrange
         with zipfile.ZipFile(self.__zip_path, 'w') as zip_file:
             output = io.StringIO()
@@ -81,8 +88,8 @@ class TestTodoistBackupAttachmentsDownloader(unittest.TestCase):
             })), "test"])
             writer.writerow(["", "", ""])
             zip_file.writestr("My Test [123456789].csv", output.getvalue())
-            zip_file.writestr("attachments/image.png", "it's a PNG")
-            zip_file.writestr("attachments/file.ini", "it's a INI")
+            zip_file.writestr("attachments/image.png", "it's a PNG (dummy data for the test MD5)")
+            zip_file.writestr("attachments/file.ini", "it's a INI (dummy data for the test MD5)")
 
         original_hash = hashlib.md5(Path(self.__zip_path).read_bytes()).hexdigest()
         backup_downloader = TodoistBackupAttachmentsDownloader(NullTracer())
@@ -95,6 +102,9 @@ class TestTodoistBackupAttachmentsDownloader(unittest.TestCase):
         self.assertEqual(original_hash, new_hash)
 
     def test_on_download_with_colliding_names_renames_attachments(self):
+        """ Does a test where there are multiple files with the same name,
+            to ensure they are renamed in order not to collide in the filesystem """
+
         # Arrange
         with zipfile.ZipFile(self.__zip_path, 'w') as zip_file:
             output = io.StringIO()

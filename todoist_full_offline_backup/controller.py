@@ -26,10 +26,10 @@ class ControllerDependencyInjector(object, metaclass=ABCMeta):
 
     @property
     @abstractmethod
-    def todoist_backup_downloader(self):
+    def backup_downloader(self):
         """ Gets an instance of the Todoist backup downloader """
 
-    def todoist_backup_attachments_downloader(self):
+    def backup_attachments_downloader(self):
         """ Gets an instance of the Todoist backup attachment downloader """
 
 class Controller:
@@ -50,9 +50,9 @@ class Controller:
         backup = self.__get_latest(backups)
         if backup is None:
             raise BackupNotFoundException()
-        bkp_path = self.__dependencies.todoist_backup_downloader.download(backup, output_path)
+        bkp_path = self.__dependencies.backup_downloader.download(backup, output_path)
         if with_attachments:
-            self.__dependencies.todoist_backup_attachments_downloader.download_attachments(bkp_path)
+            self.__dependencies.backup_attachments_downloader.download_attachments(bkp_path)
 
     def download_version(self, version, output_path, with_attachments):
         """ Downloads the specified Todoist backup ZIP given by its version string """
@@ -62,12 +62,14 @@ class Controller:
         backup = self.__find_version(backups, version)
         if backup is None:
             raise BackupNotFoundException()
-        bkp_path = self.__dependencies.todoist_backup_downloader.download(backup, output_path)
+        bkp_path = self.__dependencies.backup_downloader.download(backup, output_path)
         if with_attachments:
-            self.__dependencies.todoist_backup_attachments_downloader.download_attachments(bkp_path)
-        
-    def __get_latest(self, backups):
+            self.__dependencies.backup_attachments_downloader.download_attachments(bkp_path)
+
+    @staticmethod
+    def __get_latest(backups):
         return max(backups, key=lambda x: x.version_date, default=None)
 
-    def __find_version(self, backups, version):
+    @staticmethod
+    def __find_version(backups, version):
         return next((x for x in backups if x.version == version), None)
