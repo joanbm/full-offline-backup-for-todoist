@@ -2,11 +2,13 @@
 """ Tests for the Todoist backup + attachments downloader class """
 # pylint: disable=invalid-name
 import unittest
+from unittest.mock import MagicMock
 import tempfile
 import shutil
 import os
 import io
 import csv
+import urllib
 import zipfile
 import json
 import hashlib
@@ -25,6 +27,9 @@ class TestTodoistBackupAttachmentsDownloader(unittest.TestCase):
         Path(self.__attached_image_path).write_text("it's a PNG")
         Path(self.__attached_file_path).write_text("it's a INI")
         self.__zip_path = os.path.join(self.__test_dir, "input1.zip")
+
+        self.__fake_urldownloader = MagicMock()
+        self.__fake_urldownloader.get.side_effect = lambda url: urllib.request.urlopen(url).read()
 
     def tearDown(self):
         """ Destroys the sample filesystem structure for the test """
@@ -45,7 +50,8 @@ class TestTodoistBackupAttachmentsDownloader(unittest.TestCase):
             })), "test"])
             zip_file.writestr("My Test [123456789].csv", output.getvalue())
 
-        backup_downloader = TodoistBackupAttachmentsDownloader(NullTracer())
+        backup_downloader = TodoistBackupAttachmentsDownloader(
+            NullTracer(), self.__fake_urldownloader)
 
         # Act
         backup_downloader.download_attachments(self.__zip_path)
@@ -80,7 +86,8 @@ class TestTodoistBackupAttachmentsDownloader(unittest.TestCase):
             writer.writerow(["", "", ""])
             zip_file.writestr("My Test [123456789].csv", output.getvalue())
 
-        backup_downloader = TodoistBackupAttachmentsDownloader(NullTracer())
+        backup_downloader = TodoistBackupAttachmentsDownloader(
+            NullTracer(), self.__fake_urldownloader)
 
         # Act
         backup_downloader.download_attachments(self.__zip_path)
@@ -119,7 +126,8 @@ class TestTodoistBackupAttachmentsDownloader(unittest.TestCase):
             zip_file.writestr("attachments/file.ini", "it's a INI (dummy data for the test MD5)")
 
         original_hash = hashlib.md5(Path(self.__zip_path).read_bytes()).hexdigest()
-        backup_downloader = TodoistBackupAttachmentsDownloader(NullTracer())
+        backup_downloader = TodoistBackupAttachmentsDownloader(
+            NullTracer(), self.__fake_urldownloader)
 
         # Act
         backup_downloader.download_attachments(self.__zip_path)
@@ -153,7 +161,8 @@ class TestTodoistBackupAttachmentsDownloader(unittest.TestCase):
             writer.writerow(["", "", ""])
             zip_file.writestr("My Test [123456789].csv", output.getvalue())
 
-        backup_downloader = TodoistBackupAttachmentsDownloader(NullTracer())
+        backup_downloader = TodoistBackupAttachmentsDownloader(
+            NullTracer(), self.__fake_urldownloader)
 
         # Act
         backup_downloader.download_attachments(self.__zip_path)

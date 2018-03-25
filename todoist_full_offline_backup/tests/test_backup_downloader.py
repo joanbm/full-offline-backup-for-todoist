@@ -2,11 +2,13 @@
 """ Tests for the Todoist backup downloader class """
 # pylint: disable=invalid-name
 import unittest
+from unittest.mock import MagicMock
 import tempfile
 import shutil
 import hashlib
 import os
 import zipfile
+import urllib.request
 from pathlib import Path
 from ..todoist_api import TodoistBackupInfo
 from ..backup_downloader import TodoistBackupDownloader
@@ -23,6 +25,9 @@ class TestBackupAttachmentsDownloader(unittest.TestCase):
         with zipfile.ZipFile(self.__input_path, "w") as _:
             pass
 
+        self.__fake_urldownloader = MagicMock()
+        self.__fake_urldownloader.get.side_effect = lambda url: urllib.request.urlopen(url).read()
+
     def tearDown(self):
         """ Destroys the sample filesystem structure for the test """
         shutil.rmtree(self.__test_dir)
@@ -31,7 +36,7 @@ class TestBackupAttachmentsDownloader(unittest.TestCase):
         """ Tests that an exception is thrown when one attempts to download a backup
             that does not exist on the server """
         # Arrange
-        backup_downloader = TodoistBackupDownloader(NullTracer())
+        backup_downloader = TodoistBackupDownloader(NullTracer(), self.__fake_urldownloader)
         fake_backup = TodoistBackupInfo("123", "file:///this/path/does/not/exist/hopefully.zip")
 
         # Act/Assert
@@ -43,7 +48,7 @@ class TestBackupAttachmentsDownloader(unittest.TestCase):
             (for broad filesystem compatibility) """
 
         # Arrange
-        backup_downloader = TodoistBackupDownloader(NullTracer())
+        backup_downloader = TodoistBackupDownloader(NullTracer(), self.__fake_urldownloader)
         expected_dstpath = os.path.join(self.__test_dir, "TodoistBackup_2016-01-01 12_30.zip")
 
         # Act
@@ -58,7 +63,7 @@ class TestBackupAttachmentsDownloader(unittest.TestCase):
             it is not overwriten """
 
         # Arrange
-        backup_downloader = TodoistBackupDownloader(NullTracer())
+        backup_downloader = TodoistBackupDownloader(NullTracer(), self.__fake_urldownloader)
         expected_dstpath = os.path.join(self.__test_dir, "TodoistBackup_2016-01-01 12_30.zip")
 
         with zipfile.ZipFile(expected_dstpath, "w") as zip_file:
@@ -83,7 +88,7 @@ class TestBackupAttachmentsDownloader(unittest.TestCase):
             and the backup files can be correctly parsed """
 
         # Arrange
-        backup_downloader = TodoistBackupDownloader(NullTracer())
+        backup_downloader = TodoistBackupDownloader(NullTracer(), self.__fake_urldownloader)
 
         # This is a prepared ZIP file with UTF-8 filenames but without the UTF-8 filenames set,
         # like those that come from Todoist backups...
@@ -111,7 +116,7 @@ class TestBackupAttachmentsDownloader(unittest.TestCase):
             the backup files can be correctly parsed """
 
         # Arrange
-        backup_downloader = TodoistBackupDownloader(NullTracer())
+        backup_downloader = TodoistBackupDownloader(NullTracer(), self.__fake_urldownloader)
 
         # This is a prepared ZIP file with UTF-8 filenames and with the UTF-8 filenames set
         # pylint: disable=line-too-long

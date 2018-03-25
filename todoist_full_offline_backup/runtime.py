@@ -6,6 +6,7 @@ from .todoist_api import TodoistApi
 from .backup_downloader import TodoistBackupDownloader
 from .backup_attachments_downloader import TodoistBackupAttachmentsDownloader
 from .tracer import ConsoleTracer, NullTracer
+from .url_downloader import URLLibURLDownloader
 
 class RuntimeControllerDependencyInjector(ControllerDependencyInjector):
     """ Implementation of the dependency injection container for the actual runtime objects """
@@ -13,10 +14,11 @@ class RuntimeControllerDependencyInjector(ControllerDependencyInjector):
     def __init__(self, token, verbose):
         super(RuntimeControllerDependencyInjector, self).__init__(token, verbose)
         self.__tracer = ConsoleTracer() if verbose else NullTracer()
-        self.__todoist_api = TodoistApi(token, self.__tracer)
-        self.__backup_downloader = TodoistBackupDownloader(self.__tracer)
+        urldownloader = URLLibURLDownloader()
+        self.__todoist_api = TodoistApi(token, self.__tracer, urldownloader)
+        self.__backup_downloader = TodoistBackupDownloader(self.__tracer, urldownloader)
         self.__backup_attachments_downloader = TodoistBackupAttachmentsDownloader(
-            self.__tracer)
+            self.__tracer, urldownloader)
 
     @property
     def tracer(self):

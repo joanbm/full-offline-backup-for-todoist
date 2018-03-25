@@ -6,7 +6,6 @@ import zipfile
 import csv
 import re
 import json
-import urllib.request
 import itertools
 import os
 from .utils import sanitize_file_name
@@ -23,8 +22,9 @@ class TodoistBackupAttachmentsDownloader:
     __TODOIST_ATTACHMENT_REGEXP = re.compile(r"^\s*\[\[\s*file\s*(.+)\s*\]\]$")
     __ATTACHMENT_FOLDER = "attachments/"
 
-    def __init__(self, tracer):
+    def __init__(self, tracer, urldownloader):
         self.__tracer = tracer
+        self.__urldownloader = urldownloader
 
     @staticmethod
     def __fetch_attachment_info_from_json(json_str):
@@ -98,8 +98,7 @@ class TodoistBackupAttachmentsDownloader:
             self.__tracer.trace("[{}/{}] Downloading attachment '{}'... ".format(
                 idx+1, len(attachment_infos), attachment_info.file_name))
 
-            response = urllib.request.urlopen(attachment_info.file_url)
-            data = response.read()
+            data = self.__urldownloader.get(attachment_info.file_url)
 
             zip_file.writestr(self.__ATTACHMENT_FOLDER + attachment_info.file_name, data)
 

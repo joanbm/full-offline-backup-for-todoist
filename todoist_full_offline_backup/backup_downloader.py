@@ -1,7 +1,6 @@
 #!/usr/bin/python3
 """ Class to download Todoist backup ZIPs using the Todoist API """
 import os
-import urllib.request
 import zipfile
 from pathlib import Path
 import struct
@@ -11,8 +10,9 @@ class TodoistBackupDownloader:
     """ Class to download Todoist backup ZIPs using the Todoist API """
     __ZIP_FLAG_BITS_UTF8 = 0x800
 
-    def __init__(self, tracer):
+    def __init__(self, tracer, urldownloader):
         self.__tracer = tracer
+        self.__urldownloader = urldownloader
 
     def __fixup_zip_utf8_flags(self, backup_zip_path):
         """ Todoist backup ZIPs may contain filenames encoded in UTF-8, but they will not
@@ -84,7 +84,8 @@ class TodoistBackupDownloader:
         if not os.path.isfile(output_file_path):
             self.__tracer.trace("Downloading from {} to file '{}'...".format(
                 backup.url, output_file_path))
-            urllib.request.urlretrieve(backup.url, output_file_path)
+            raw_zip_bytes = self.__urldownloader.get(backup.url)
+            Path(output_file_path).write_bytes(raw_zip_bytes)
         else:
             self.__tracer.trace("File '{}' already downloaded... skipping".format(
                 output_file_path))
