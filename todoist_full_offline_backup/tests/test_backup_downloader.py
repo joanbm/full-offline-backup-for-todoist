@@ -7,8 +7,8 @@ import tempfile
 import shutil
 import hashlib
 import os
+import io
 import zipfile
-import urllib.request
 from pathlib import Path
 from ..todoist_api import TodoistBackupInfo
 from ..backup_downloader import TodoistBackupDownloader
@@ -19,14 +19,15 @@ class TestBackupAttachmentsDownloader(unittest.TestCase):
     def setUp(self):
         """ Creates the sample filesystem structure for the test """
         self.__test_dir = tempfile.mkdtemp()
-        self.__input_path = os.path.join(self.__test_dir, "input1.zip")
-        self.__backup = TodoistBackupInfo("2016-01-01 12:30", "file://" + self.__input_path)
+        self.__backup = TodoistBackupInfo("2016-01-01 12:30", "http://www.example.com/backup.zip")
 
-        with zipfile.ZipFile(self.__input_path, "w") as _:
+        empty_zip_bytes_io = io.BytesIO()
+        with zipfile.ZipFile(empty_zip_bytes_io, "w") as _:
             pass
+        empty_zip_bytes = empty_zip_bytes_io.getvalue()
 
-        self.__fake_urldownloader = MagicMock()
-        self.__fake_urldownloader.get.side_effect = lambda url: urllib.request.urlopen(url).read()
+        self.__urlmap = {"http://www.example.com/backup.zip": empty_zip_bytes}
+        self.__fake_urldownloader = MagicMock(get=lambda url: self.__urlmap[url])
 
     def tearDown(self):
         """ Destroys the sample filesystem structure for the test """
@@ -93,12 +94,12 @@ class TestBackupAttachmentsDownloader(unittest.TestCase):
         # This is a prepared ZIP file with UTF-8 filenames but without the UTF-8 filenames set,
         # like those that come from Todoist backups...
         # pylint: disable=line-too-long
-        Path(self.__input_path).write_bytes(bytearray.fromhex(
+        self.__urlmap = {"http://www.example.com/backup.zip": bytearray.fromhex(
             '504b03040a03000000000b90524c0000000000000000000000000d00000041534349494e414d452e747874' +
             '504b03040a03000000000f90524c00000000000000000000000014000000554e49434f44454e414d4520f09f92a92e747874' +
             '504b01023f030a03000000000b90524c0000000000000000000000000d0024000000000000002080a4810000000041534349494e414d452e7478740a0020000000000001001800005773f6d9a8d301005773f6d9a8d301005773f6d9a8d301' +
             '504b01023f030a03000000000f90524c000000000000000000000000140024000000000000002080a4812b000000554e49434f44454e414d4520f09f92a92e7478740a002000000000000100180080749ffad9a8d30180749ffad9a8d30180749ffad9a8d301' +
-            '504b05060000000002000200c50000005d0000000000'))
+            '504b05060000000002000200c50000005d0000000000')}
 
         # Act
         dstpath = backup_downloader.download(self.__backup, self.__test_dir)
@@ -120,12 +121,12 @@ class TestBackupAttachmentsDownloader(unittest.TestCase):
 
         # This is a prepared ZIP file with UTF-8 filenames and with the UTF-8 filenames set
         # pylint: disable=line-too-long
-        Path(self.__input_path).write_bytes(bytearray.fromhex(
+        self.__urlmap = {"http://www.example.com/backup.zip": bytearray.fromhex(
             '504b03040a03000800000b90524c0000000000000000000000000d00000041534349494e414d452e747874' +
             '504b03040a03000800000f90524c00000000000000000000000014000000554e49434f44454e414d4520f09f92a92e747874' +
             '504b01023f030a03000800000b90524c0000000000000000000000000d0024000000000000002080a4810000000041534349494e414d452e7478740a0020000000000001001800005773f6d9a8d301005773f6d9a8d301005773f6d9a8d301' +
             '504b01023f030a03000800000f90524c000000000000000000000000140024000000000000002080a4812b000000554e49434f44454e414d4520f09f92a92e7478740a002000000000000100180080749ffad9a8d30180749ffad9a8d30180749ffad9a8d301' +
-            '504b05060000000002000200c50000005d0000000000'))
+            '504b05060000000002000200c50000005d0000000000')}
 
         # Act
         dstpath = backup_downloader.download(self.__backup, self.__test_dir)

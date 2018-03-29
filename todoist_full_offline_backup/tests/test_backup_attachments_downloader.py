@@ -8,7 +8,6 @@ import shutil
 import os
 import io
 import csv
-import urllib
 import zipfile
 import json
 import hashlib
@@ -22,14 +21,13 @@ class TestTodoistBackupAttachmentsDownloader(unittest.TestCase):
     def setUp(self):
         """ Creates the sample filesystem structure for the test """
         self.__test_dir = tempfile.mkdtemp()
-        self.__attached_image_path = os.path.join(self.__test_dir, "image.jpg")
-        self.__attached_file_path = os.path.join(self.__test_dir, "file.ini")
-        Path(self.__attached_image_path).write_text("it's a PNG")
-        Path(self.__attached_file_path).write_text("it's a INI")
         self.__zip_path = os.path.join(self.__test_dir, "input1.zip")
 
-        self.__fake_urldownloader = MagicMock()
-        self.__fake_urldownloader.get.side_effect = lambda url: urllib.request.urlopen(url).read()
+        self.__urlmap = {
+            "http://www.example.com/image.jpg": "it's a PNG".encode("utf-8"),
+            "http://www.example.com/file.ini": "it's a INI".encode("utf-8"),
+        }
+        self.__fake_urldownloader = MagicMock(get=lambda url: self.__urlmap[url])
 
     def tearDown(self):
         """ Destroys the sample filesystem structure for the test """
@@ -46,7 +44,7 @@ class TestTodoistBackupAttachmentsDownloader(unittest.TestCase):
             writer.writerow(["note", " [[file {}]]".format(json.dumps({
                 "file_type": "image/png",
                 "file_name": "this/is/an/image.png",
-                "file_url": "file://" + self.__attached_image_path
+                "file_url": "http://www.example.com/image.jpg"
             })), "test"])
             zip_file.writestr("My Test [123456789].csv", output.getvalue())
 
@@ -74,14 +72,14 @@ class TestTodoistBackupAttachmentsDownloader(unittest.TestCase):
             writer.writerow(["note", " [[file {}]]".format(json.dumps({
                 "file_type": "image/png",
                 "file_name": "image.png",
-                "file_url": "file://" + self.__attached_image_path
+                "file_url": "http://www.example.com/image.jpg"
             })), "test"])
 
             writer.writerow(["task", "This is another random task", "4"])
             writer.writerow(["note", " [[file {}]]".format(json.dumps({
                 "file_type": "image/png",
                 "file_name": "file.ini",
-                "file_url": "file://" + self.__attached_file_path
+                "file_url": "http://www.example.com/file.ini"
             })), "test"])
             writer.writerow(["", "", ""])
             zip_file.writestr("My Test [123456789].csv", output.getvalue())
@@ -111,14 +109,14 @@ class TestTodoistBackupAttachmentsDownloader(unittest.TestCase):
             writer.writerow(["note", " [[file {}]]".format(json.dumps({
                 "file_type": "image/png",
                 "file_name": "image.png",
-                "file_url": "file://" + self.__attached_image_path
+                "file_url": "http://www.example.com/image.jpg"
             })), "test"])
 
             writer.writerow(["task", "This is another random task", "4"])
             writer.writerow(["note", " [[file {}]]".format(json.dumps({
                 "file_type": "image/png",
                 "file_name": "file.ini",
-                "file_url": "file://" + self.__attached_file_path
+                "file_url": "http://www.example.com/file.ini"
             })), "test"])
             writer.writerow(["", "", ""])
             zip_file.writestr("My Test [123456789].csv", output.getvalue())
@@ -149,14 +147,14 @@ class TestTodoistBackupAttachmentsDownloader(unittest.TestCase):
             writer.writerow(["note", " [[file {}]]".format(json.dumps({
                 "file_type": "image/png",
                 "file_name": "image.png",
-                "file_url": "file://" + self.__attached_image_path
+                "file_url": "http://www.example.com/image.jpg"
             })), "test"])
 
             writer.writerow(["task", "This is another random task", "4"])
             writer.writerow(["note", " [[file {}]]".format(json.dumps({
                 "file_type": "image/png",
                 "file_name": "image.png",
-                "file_url": "file://" + self.__attached_file_path
+                "file_url": "http://www.example.com/file.ini"
             })), "test"])
             writer.writerow(["", "", ""])
             zip_file.writestr("My Test [123456789].csv", output.getvalue())
