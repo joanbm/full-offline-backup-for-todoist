@@ -19,7 +19,7 @@ class TodoistAttachmentInfo:
 class TodoistBackupAttachmentsDownloader:
     """ Provides utilities for downloading the attachments of a Todoist backup """
 
-    __TODOIST_ATTACHMENT_REGEXP = re.compile(r"^\s*\[\[\s*file\s*(.+)\s*\]\]$")
+    __TODOIST_ATTACHMENT_REGEXP = re.compile(r"\[\[\s*file\s*(.+)\s*\]\]")
     __ATTACHMENT_FOLDER = "attachments/"
 
     def __init__(self, tracer, urldownloader):
@@ -31,6 +31,11 @@ class TodoistBackupAttachmentsDownloader:
         """ Fetches the information of an attachment of a Todoist backup CSV file,
             given the JSON content of a task with an attachment """
         json_data = json.loads(json_str)
+
+        # Exclude those files that are created from e.g. external website links
+        if "file_name" not in json_data or "file_url" not in json_data:
+            return None
+
         return TodoistAttachmentInfo(sanitize_file_name(json_data["file_name"]),
                                      json_data["file_url"])
 
@@ -41,9 +46,11 @@ class TodoistBackupAttachmentsDownloader:
 
         csv_reader = csv.DictReader(csv_string.split('\n'))
         for row in csv_reader:
-            match = self.__TODOIST_ATTACHMENT_REGEXP.match(row["CONTENT"])
-            if match != None:
-                attachment_infos.append(self.__fetch_attachment_info_from_json(match.group(1)))
+            matches = self.__TODOIST_ATTACHMENT_REGEXP.findall(row["CONTENT"])
+            for matchstr in matches:
+                attachment_info = self.__fetch_attachment_info_from_json(matchstr)
+                if attachment_info != None:
+                    attachment_infos.append(attachment_info)
 
         return attachment_infos
 
