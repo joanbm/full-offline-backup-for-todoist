@@ -5,6 +5,7 @@ import unittest
 from unittest.mock import patch
 import urllib.request
 import os
+import io
 from pathlib import Path
 import tempfile
 import zipfile
@@ -74,6 +75,24 @@ class TestIntegration(unittest.TestCase):
                     content_2 = zip_file_2.read(filename)
                     self.assertEqual(content_1, content_2)
 
+    @patch.object(sys, 'argv', ["program",
+                                "list",
+                                "--token", "mysecrettoken"])
+    @patch.object(urllib.request, 'urlopen')
+    @patch.object(sys, 'stdout', new_callable=io.StringIO)
+    def test_integration_list_backups(self, mock_stdout, mock_urlopen):
+        """ Integration test for listing all the backups in the system """
+
+        # Arrange
+        mock_urlopen.side_effect = self.__urlopen_redirect_to_local
+
+        # Act
+        main()
+
+        # Assert
+        expected_list_path = self.__get_test_file("expected/BackupList.txt")
+        expected_list = Path(expected_list_path).read_bytes().decode("utf-8")
+        self.assertEqual(mock_stdout.getvalue(), expected_list)
 
     @patch.object(sys, 'argv', ["program",
                                 "download", "LATEST", "--with-attachments",
@@ -81,11 +100,32 @@ class TestIntegration(unittest.TestCase):
     @patch.object(urllib.request, 'urlopen')
     def test_integration_download_latest_with_attachments(self, mock_urlopen):
         """ Integration test for downloading the latest backup with attachments """
+
+        # Arrange
         mock_urlopen.side_effect = self.__urlopen_redirect_to_local
 
+        # Act
         main()
 
         # Arrange
         expected_file = self.__get_test_file("expected/TodoistBackupWAttach_2018-03-25 10_13.zip")
         actual_file = os.path.join(self.__test_dir, "TodoistBackup_2018-03-25 10_13.zip")
+        self.__compare_zip_files(expected_file, actual_file)
+
+    @patch.object(sys, 'argv', ["program",
+                                "download", "2018-03-25 10:12",
+                                "--token", "mysecrettoken"])
+    @patch.object(urllib.request, 'urlopen')
+    def test_integration_download_specific(self, mock_urlopen):
+        """ Integration test for downloading a specific backup (without attachments) """
+
+        # Arrange
+        mock_urlopen.side_effect = self.__urlopen_redirect_to_local
+
+        # Act
+        main()
+
+        # Arrange
+        expected_file = self.__get_test_file("expected/TodoistBackup_2018-03-25 10_12.zip")
+        actual_file = os.path.join(self.__test_dir, "TodoistBackup_2018-03-25 10_12.zip")
         self.__compare_zip_files(expected_file, actual_file)
