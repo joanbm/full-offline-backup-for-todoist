@@ -12,7 +12,7 @@ provides=('todoist-full-offline-backup')
 conflicts=('todoist-full-offline-backup')
 options=(!emptydirs)
 source=(https://github.com/joanbm/${pkgname}/archive/${pkgver}.tar.gz)
-md5sums=('SKIP')
+sha256sums=('SKIP') # Add real hash before install / upload to AUR! 
 
 package() {
   cd "${pkgname}-${pkgver}"
