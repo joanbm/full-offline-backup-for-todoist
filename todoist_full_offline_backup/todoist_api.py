@@ -33,7 +33,7 @@ class TodoistApi:
             self.__BACKUP_LIST_ENDPOINT, {"token": self.__api_token})
 
         self.__tracer.trace("Loading Todoist API backup JSON...")
-        backup_list = json.loads(backup_list_json)
+        backup_list = json.loads(backup_list_json.decode())
 
         self.__tracer.trace("Parsing Todoist API backup JSON...")
         return [TodoistBackupInfo(row["version"], row["url"]) for row in backup_list]

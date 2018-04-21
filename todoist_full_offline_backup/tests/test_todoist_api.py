@@ -15,7 +15,7 @@ class TestTodoistApi(unittest.TestCase):
             an empty list of backups is returned """
         # Arrange
         mock_urldownloader = MagicMock()
-        mock_urldownloader.get.return_value = "[]"
+        mock_urldownloader.get.return_value = "[]".encode()
 
         # Act
         backups = TodoistApi("FAKE_TOKEN", NullTracer(), mock_urldownloader).get_backups()
@@ -32,7 +32,7 @@ class TestTodoistApi(unittest.TestCase):
         mock_urldownloader.get.return_value = """[
             {"version":"2016-01-13 02:03","url":"https://www.example.com/1.zip"},
             {"version":"2016-01-12 06:03","url":"https://www.example.com/2.zip"}
-        ]"""
+        ]""".encode()
 
         todoist_api = TodoistApi("FAKE_TOKEN", NullTracer(), mock_urldownloader)
 
@@ -55,7 +55,7 @@ class TestTodoistApi(unittest.TestCase):
 
         # Arrange
         mock_urldownloader = MagicMock()
-        mock_urldownloader.get.return_value = "[]"
+        mock_urldownloader.get.return_value = "[]".encode()
 
         todoist_api = TodoistApi("FAKE TOKEN", NullTracer(), mock_urldownloader)
 
@@ -70,7 +70,7 @@ class TestTodoistApi(unittest.TestCase):
 
         # Arrange
         mock_urldownloader = MagicMock()
-        mock_urldownloader.get.return_value = "["
+        mock_urldownloader.get.return_value = "[".encode()
 
         todoist_api = TodoistApi("FAKE_TOKEN", NullTracer(), mock_urldownloader)
 
