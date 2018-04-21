@@ -24,8 +24,8 @@ class TestTodoistBackupAttachmentsDownloader(unittest.TestCase):
         self.__zip_path = os.path.join(self.__test_dir, "input1.zip")
 
         self.__urlmap = {
-            "http://www.example.com/image.jpg": "it's a PNG".encode("utf-8"),
-            "http://www.example.com/file.ini": "it's a INI".encode("utf-8"),
+            "http://www.example.com/image.jpg": "it's a PNG".encode(),
+            "http://www.example.com/file.ini": "it's a INI".encode(),
         }
         self.__fake_urldownloader = MagicMock(get=lambda url: self.__urlmap[url])
 
@@ -57,7 +57,7 @@ class TestTodoistBackupAttachmentsDownloader(unittest.TestCase):
         # Assert
         with zipfile.ZipFile(self.__zip_path, 'r') as zip_file:
             self.assertIn("attachments/this_is_an_image.png", zip_file.namelist())
-            self.assertEqual(zip_file.read("attachments/this_is_an_image.png").decode('utf-8'),
+            self.assertEqual(zip_file.read("attachments/this_is_an_image.png").decode(),
                              "it's a PNG")
 
     def test_filename_with_slash_is_sanitized(self):
@@ -94,8 +94,8 @@ class TestTodoistBackupAttachmentsDownloader(unittest.TestCase):
         with zipfile.ZipFile(self.__zip_path, 'r') as zip_file:
             self.assertIn("attachments/image.png", zip_file.namelist())
             self.assertIn("attachments/file.ini", zip_file.namelist())
-            self.assertEqual(zip_file.read("attachments/image.png").decode('utf-8'), "it's a PNG")
-            self.assertEqual(zip_file.read("attachments/file.ini").decode('utf-8'), "it's a INI")
+            self.assertEqual(zip_file.read("attachments/image.png").decode(), "it's a PNG")
+            self.assertEqual(zip_file.read("attachments/file.ini").decode(), "it's a INI")
 
     def test_on_download_with_already_downloaded_doesnt_overwrite(self):
         """ Does a test where an attachment has already been downloaded,
@@ -169,5 +169,5 @@ class TestTodoistBackupAttachmentsDownloader(unittest.TestCase):
         with zipfile.ZipFile(self.__zip_path, 'r') as zip_file:
             self.assertIn("attachments/image.png", zip_file.namelist())
             self.assertIn("attachments/image_2.png", zip_file.namelist())
-            self.assertEqual(zip_file.read("attachments/image.png").decode('utf-8'), "it's a PNG")
-            self.assertEqual(zip_file.read("attachments/image_2.png").decode('utf-8'), "it's a INI")
+            self.assertEqual(zip_file.read("attachments/image.png").decode(), "it's a PNG")
+            self.assertEqual(zip_file.read("attachments/image_2.png").decode(), "it's a INI")

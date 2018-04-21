@@ -91,7 +91,7 @@ class TestIntegration(unittest.TestCase):
 
         # Assert
         expected_list_path = self.__get_test_file("expected/BackupList.txt")
-        expected_list = Path(expected_list_path).read_bytes().decode("utf-8")
+        expected_list = Path(expected_list_path).read_bytes().decode()
         self.assertEqual(mock_stdout.getvalue(), expected_list)
 
     @patch.object(sys, 'argv', ["program",
