@@ -31,15 +31,19 @@ app.zip: app
 	zip -r $@ $<
 
 
-serve: python.asm.js app.zip
-	@echo "Serving on port 8062"
-	python -m SimpleHTTPServer 8062
+serve: cpython-emscripten.zip python.asm.js app.zip
+	@echo "Serving on port 8000"
+	python3 -m http.server 8000
 
 
 clean:
+	-rm -f cpython-emscripten.zip
+	-rm -fr cpython-emscripten
 	-rm -fr root
-	-rm python.asm.js python.asm.data
-	-rm *.bc
+	-rm -f python.asm.js python.asm.data	
+	-rm -f *.bc
+	-rm -fr app/todoist_full_offline_backup
+	-rm -f app.zip
 
 
 %.bc: %.c cpython-emscripten/installs/python-$(PYVERSION)/lib/python$(PYMINOR)

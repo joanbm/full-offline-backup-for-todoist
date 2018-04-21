@@ -7,8 +7,7 @@ This is an experiment of porting todoist-full-offline-backup to the web (purely 
 * Cython
 
 ## Instructions
-* Run the makefile
-* Run 'python3 -m http.server'
+* Run 'make serve' and wait for it to finish
 * Open http://localhost:8000 in the browser
 
 ## Things that need solving
