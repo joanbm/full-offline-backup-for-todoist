@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+    </head>
+    <body>
+        <script>
+        function askCommandLine() {
+            return prompt("Enter the command line args",
+                "todoist-offline-backup-dl --verbose download LATEST --token XXX");
+        }
+
+        function hexEncode(str) {
+            var hexString = "";
+            for (var i = 0; i < str.length; i++)
+                hexString += ("0" + str.charCodeAt(i).toString(16)).slice(-2);
+            return hexString;
+        }
+
+        function hexDecode(hexString) {
+            var str = "";
+            for (var i = 0; i < hexString.length; i += 2)
+                str += String.fromCharCode(parseInt(hexString.substr(i, 2), 16));
+            return str;
+        }
+
+        function downloadBinaryFile(url) {
+            var req = new XMLHttpRequest();
+            req.open('GET', url, false);
+            // Force interpreting the response as binary - See "Receiving binary data",
+            // https://developer.mozilla.org/es/docs/Web/API/XMLHttpRequest/Using_XMLHttpRequest
+            req.overrideMimeType('text/plain; charset=x-user-defined'); // Force binary
+            req.send(null);
+            return req.responseText;
+        }
+
+        function offerDownloadOfBinaryFile(str, filename) {
+            // Convert the string to a byte array, because otherwise
+            // it will be treated specially when creating the blob
+            array = new Uint8Array(str.length);
+            for (var i = 0; i < str.length; i++){
+                array[i] = str.charCodeAt(i);
+            }
+
+            // Create the blob as a raw byte array
+            var blob  = new Blob([array], {type: "application/octet-stream"});
+
+            // Offer the download of the blob with some boilerplate code...
+            var a = document.createElement('a');
+            document.body.appendChild(a);
+            var url = window.URL.createObjectURL(blob);
+            a.href = url;
+            a.download = filename;
+            a.click();
+            setTimeout(() => {
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+            }, 0);
+        }
+        </script>
+        <script src='python.asm.js'></script>
+    </body>
+</html>
