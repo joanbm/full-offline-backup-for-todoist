@@ -43,18 +43,18 @@ class Controller:
         backups = self.__dependencies.todoist_api.get_backups()
         return (backups, self.__get_latest(backups))
 
-    def download_latest(self, output_path, with_attachments):
+    def download_latest(self, vfs, with_attachments):
         """ Downloads the latest (i.e. most recent) Todoist backup ZIP """
         self.__dependencies.tracer.trace("Fetching backup list to find the latest backup...")
         backups = self.__dependencies.todoist_api.get_backups()
         backup = self.__get_latest(backups)
         if backup is None:
             raise BackupNotFoundException()
-        bkp_path = self.__dependencies.backup_downloader.download(backup, output_path)
+        self.__dependencies.backup_downloader.download(backup, vfs)
         if with_attachments:
-            self.__dependencies.backup_attachments_downloader.download_attachments(bkp_path)
+            self.__dependencies.backup_attachments_downloader.download_attachments(vfs)
 
-    def download_version(self, version, output_path, with_attachments):
+    def download_version(self, version, vfs, with_attachments):
         """ Downloads the specified Todoist backup ZIP given by its version string """
         self.__dependencies.tracer.trace(
             "Fetching backup list to find the backup '{}'...".format(version))
@@ -62,9 +62,9 @@ class Controller:
         backup = self.__find_version(backups, version)
         if backup is None:
             raise BackupNotFoundException()
-        bkp_path = self.__dependencies.backup_downloader.download(backup, output_path)
+        self.__dependencies.backup_downloader.download(backup, vfs)
         if with_attachments:
-            self.__dependencies.backup_attachments_downloader.download_attachments(bkp_path)
+            self.__dependencies.backup_attachments_downloader.download_attachments(vfs)
 
     @staticmethod
     def __get_latest(backups):

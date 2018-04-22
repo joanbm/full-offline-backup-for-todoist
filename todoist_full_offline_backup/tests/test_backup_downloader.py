@@ -3,22 +3,17 @@
 # pylint: disable=invalid-name
 import unittest
 from unittest.mock import MagicMock
-import tempfile
-import shutil
-import hashlib
-import os
 import io
 import zipfile
-from pathlib import Path
 from ..todoist_api import TodoistBackupInfo
 from ..backup_downloader import TodoistBackupDownloader
 from ..tracer import NullTracer
+from .test_util_memory_vfs import InMemoryVfs
 
-class TestBackupAttachmentsDownloader(unittest.TestCase):
+class TestBackupDownloader(unittest.TestCase):
     """ Tests for the Todoist backup downloader class """
     def setUp(self):
-        """ Creates the sample filesystem structure for the test """
-        self.__test_dir = tempfile.mkdtemp()
+        """ Creates the sample instrastructure for the test """
         self.__backup = TodoistBackupInfo("2016-01-01 12:30", "http://www.example.com/backup.zip")
 
         empty_zip_bytes_io = io.BytesIO()
@@ -29,9 +24,6 @@ class TestBackupAttachmentsDownloader(unittest.TestCase):
         self.__urlmap = {"http://www.example.com/backup.zip": empty_zip_bytes}
         self.__fake_urldownloader = MagicMock(get=lambda url: self.__urlmap[url])
 
-    def tearDown(self):
-        """ Destroys the sample filesystem structure for the test """
-        shutil.rmtree(self.__test_dir)
 
     def test_on_nonexisting_version_throws_exception(self):
         """ Tests that an exception is thrown when one attempts to download a backup
@@ -43,53 +35,30 @@ class TestBackupAttachmentsDownloader(unittest.TestCase):
         # Act/Assert
         self.assertRaises(Exception, backup_downloader.download, fake_backup, "/")
 
-    def test_on_existing_version_downloads_file_with_sanitized_filename(self):
-        """ Tests that if a backup contains disallowed characters in its name,
-            it is correctly sanitized to a restricted character set
-            (for broad filesystem compatibility) """
-
-        # Arrange
-        backup_downloader = TodoistBackupDownloader(NullTracer(), self.__fake_urldownloader)
-        expected_dstpath = os.path.join(self.__test_dir, "TodoistBackup_2016-01-01 12_30.zip")
-
-        # Act
-        dstpath = backup_downloader.download(self.__backup, self.__test_dir)
-
-        # Assert
-        self.assertEqual(dstpath, expected_dstpath)
-        self.assertTrue(zipfile.is_zipfile(expected_dstpath))
-
     def test_on_latest_version_and_existing_destination_doesnt_overwrite(self):
         """ Tests that if the backup already exists in the destination path,
             it is not overwriten """
 
         # Arrange
         backup_downloader = TodoistBackupDownloader(NullTracer(), self.__fake_urldownloader)
-        expected_dstpath = os.path.join(self.__test_dir, "TodoistBackup_2016-01-01 12_30.zip")
-
-        with zipfile.ZipFile(expected_dstpath, "w") as zip_file:
-            zip_file.writestr("dummy.txt", "dummy data for the test MD5")
-
-            # Otherwise the downloader patches the ZIP anyway, if it exists...
-            zip_file.getinfo("dummy.txt").flag_bits |= 0x800
-
-        original_hash = hashlib.md5(Path(expected_dstpath).read_bytes()).hexdigest()
+        vfs = InMemoryVfs()
+        vfs.write_file("test", b'testdata')
 
         # Act
-        dstpath = backup_downloader.download(self.__backup, self.__test_dir)
+        backup_downloader.download(self.__backup, vfs)
 
         # Assert
-        self.assertEqual(dstpath, expected_dstpath)
-        new_hash = hashlib.md5(Path(expected_dstpath).read_bytes()).hexdigest()
-        self.assertEqual(original_hash, new_hash)
+        self.assertEqual(vfs.file_list(), ["test"])
+        self.assertEqual(vfs.read_file("test"), b'testdata')
 
-    def test_on_zip_with_no_utf8_flag_sets_flag(self):
+    def test_on_zip_with_no_utf8_parses_utf8_filename(self):
         """ Tests that, if the server provides a backup ZIP file with no UTF-8 filename flag,
             it is patched to include it (since the Todoist servers provide ZIPs without it)
             and the backup files can be correctly parsed """
 
         # Arrange
         backup_downloader = TodoistBackupDownloader(NullTracer(), self.__fake_urldownloader)
+        vfs = InMemoryVfs()
 
         # This is a prepared ZIP file with UTF-8 filenames but without the UTF-8 filenames set,
         # like those that come from Todoist backups...
@@ -102,15 +71,11 @@ class TestBackupAttachmentsDownloader(unittest.TestCase):
             '504b05060000000002000200c50000005d0000000000')}
 
         # Act
-        dstpath = backup_downloader.download(self.__backup, self.__test_dir)
+        backup_downloader.download(self.__backup, vfs)
 
         # Assert
-        with zipfile.ZipFile(dstpath, "r") as zip_file:
-            self.assertEqual(zip_file.testzip(), None)
-            self.assertIn("ASCIINAME.txt", zip_file.namelist())
-            self.assertTrue(zip_file.getinfo("ASCIINAME.txt").flag_bits & 0x800)
-            self.assertIn("UNICODENAME 💩.txt", zip_file.namelist())
-            self.assertTrue(zip_file.getinfo("UNICODENAME 💩.txt").flag_bits & 0x800)
+        self.assertIn("ASCIINAME.txt", vfs.file_list())
+        self.assertIn("UNICODENAME 💩.txt", vfs.file_list())
 
     def test_on_zip_with_utf8_flag_does_not_break(self):
         """ Tests that, if the server provides a backup ZIP file with the UTF-8 filename flag,
@@ -118,6 +83,7 @@ class TestBackupAttachmentsDownloader(unittest.TestCase):
 
         # Arrange
         backup_downloader = TodoistBackupDownloader(NullTracer(), self.__fake_urldownloader)
+        vfs = InMemoryVfs()
 
         # This is a prepared ZIP file with UTF-8 filenames and with the UTF-8 filenames set
         # pylint: disable=line-too-long
@@ -129,12 +95,8 @@ class TestBackupAttachmentsDownloader(unittest.TestCase):
             '504b05060000000002000200c50000005d0000000000')}
 
         # Act
-        dstpath = backup_downloader.download(self.__backup, self.__test_dir)
+        backup_downloader.download(self.__backup, vfs)
 
         # Assert
-        with zipfile.ZipFile(dstpath, "r") as zip_file:
-            self.assertEqual(zip_file.testzip(), None)
-            self.assertIn("ASCIINAME.txt", zip_file.namelist())
-            self.assertTrue(zip_file.getinfo("ASCIINAME.txt").flag_bits & 0x800)
-            self.assertIn("UNICODENAME 💩.txt", zip_file.namelist())
-            self.assertTrue(zip_file.getinfo("UNICODENAME 💩.txt").flag_bits & 0x800)
+        self.assertIn("ASCIINAME.txt", vfs.file_list())
+        self.assertIn("UNICODENAME 💩.txt", vfs.file_list())

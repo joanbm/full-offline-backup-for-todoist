@@ -2,6 +2,8 @@
 """ Implementation of the console frontend of the Todoist backup utility """
 
 import argparse
+from pathlib import Path
+from .virtual_fs import ZipVirtualFs
 
 class ConsoleFrontend:
     """ Implementation of the console frontend for the Todoist backup tool """
@@ -9,6 +11,14 @@ class ConsoleFrontend:
         self.__controller_factory = controller_factory
         self.__controller_dependencies_factory = controller_dependencies_factory
         self.__controller = None
+
+    @staticmethod
+    def __add_token_group(parser):
+        token_group = parser.add_mutually_exclusive_group(required=True)
+        token_group.add_argument("--token", type=str,
+                                 help="todoist API token (see Settings --> Integration)")
+        token_group.add_argument("--token-file", type=str,
+                                 help="file containing the todoist API token")
 
     def __parse_command_line_args(self, prog, arguments):
         example1_str = "Example: {} download LATEST --token 0123456789abcdef".format(prog)
@@ -22,8 +32,7 @@ class ConsoleFrontend:
         # create the parser for the "list" command
         parser_list = subparsers.add_parser('list', help='list available backups')
         parser_list.set_defaults(func=self.handle_list)
-        parser_list.add_argument("--token", type=str, required=True,
-                                 help="todoist API token (see Settings --> Integration)")
+        self.__add_token_group(parser_list)
 
         # create the parser for the "download" command
         parser_download = subparsers.add_parser('download', help='download specified backup')
@@ -32,8 +41,9 @@ class ConsoleFrontend:
                                      help="backup version to download, or LATEST")
         parser_download.add_argument("--with-attachments", action="store_true",
                                      help="download attachments and attach to the backup file")
-        parser_download.add_argument("--token", type=str, required=True,
-                                     help="todoist API token (see Settings --> Integration)")
+        parser_download.add_argument("--output-file", type=str,
+                                     help="name of the file that will store the backup")
+        self.__add_token_group(parser_download)
 
         return parser.parse_args(arguments)
 
@@ -42,10 +52,18 @@ class ConsoleFrontend:
         args = self.__parse_command_line_args(prog, arguments)
         args.func(args)
 
+    @staticmethod
+    def __get_token(args):
+        if args.token_file:
+            return Path(args.token_file).read_text()
+
+        return args.token
+
     def handle_list(self, args):
         """ Handles the list subparser with the specified command line arguments """
         # Configure controller
-        dependencies = self.__controller_dependencies_factory(args.token, args.verbose)
+        token = self.__get_token(args)
+        dependencies = self.__controller_dependencies_factory(token, args.verbose)
         controller = self.__controller_factory(dependencies)
 
         # Execute requested action
@@ -59,11 +77,15 @@ class ConsoleFrontend:
         """ Handles the download subparser with the specified command line arguments """
 
         # Configure controller
-        dependencies = self.__controller_dependencies_factory(args.token, args.verbose)
+        token = self.__get_token(args)
+        dependencies = self.__controller_dependencies_factory(token, args.verbose)
         controller = self.__controller_factory(dependencies)
 
-        # Execute requested action
-        if args.version == 'LATEST':
-            controller.download_latest(".", with_attachments=args.with_attachments)
-        else:
-            controller.download_version(args.version, ".", with_attachments=args.with_attachments)
+        # Setup zip virtual fs
+        with ZipVirtualFs(args.output_file) as zipvfs:
+            # Execute requested action
+            if args.version == 'LATEST':
+                controller.download_latest(zipvfs, with_attachments=args.with_attachments)
+            else:
+                controller.download_version(args.version, zipvfs,
+                                            with_attachments=args.with_attachments)

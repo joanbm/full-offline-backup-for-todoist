@@ -12,7 +12,7 @@ class TestStaticHTTPServer:
         self.__httpd_thread.start()
 
     def shutdown(self):
-        """ Destroys the sample filesystem structure and HTTP server for the test """
+        """ Destroys the sample HTTP server for the test """
         self.__httpd.shutdown()
         self.__httpd_thread.join()
         self.__httpd.server_close()

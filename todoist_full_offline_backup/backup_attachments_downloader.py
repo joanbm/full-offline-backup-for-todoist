@@ -1,8 +1,7 @@
 #!/usr/bin/python3
-""" Utility to download the attachments associated with a Todoist backup ZIP
-    The downloaded attachments are packed to the same ZIP file """
+""" Utility to download the attachments associated with a Todoist backup VFS
+    The downloaded attachments are packed to the same VFS """
 
-import zipfile
 import csv
 import re
 import json
@@ -54,19 +53,18 @@ class TodoistBackupAttachmentsDownloader:
 
         return attachment_infos
 
-    def __fetch_attachment_infos_from_zip(self, zip_file):
+    def __fetch_attachment_infos(self, vfs):
         """ Fetches the information of all the attachment_infos
-            of the current Todoist backup ZIP file """
-        self.__tracer.trace("Reading ZIP file...")
+            of the current Todoist backup VFS """
+        self.__tracer.trace("Reading VFS...")
 
         attachment_infos = []
 
         # We iterate over the sorted file name list, so the resulting list
-        # is always in a consistent order independently of quirks
-        # in the ZIP format
-        for name in sorted(zip_file.namelist()):
+        # is always in a consistent order independently of quirks in the VFS
+        for name in sorted(vfs.file_list()):
             self.__tracer.trace("Parsing CSV file '{}'...".format(name))
-            csv_string = zip_file.read(name).decode('utf-8-sig')
+            csv_string = vfs.read_file(name).decode('utf-8-sig')
             attachment_infos.extend(self.__fetch_attachment_infos_from_csv(csv_string))
 
         return attachment_infos
@@ -98,32 +96,31 @@ class TodoistBackupAttachmentsDownloader:
 
             included_attachment_names.add(attachment_info.file_name)
 
-    def __download_and_pack_attachments(self, attachment_infos, zip_file):
+    def __download_and_pack_attachments(self, attachment_infos, vfs):
         """ Downloads and packs the given attachments in a folder 'attachments'
-            of the current Todoist backup ZIP file """
+            of the current Todoist backup VFS """
         for idx, attachment_info in enumerate(attachment_infos):
             self.__tracer.trace("[{}/{}] Downloading attachment '{}'... ".format(
                 idx+1, len(attachment_infos), attachment_info.file_name))
 
             data = self.__urldownloader.get(attachment_info.file_url)
 
-            zip_file.writestr(self.__ATTACHMENT_FOLDER + attachment_info.file_name, data)
+            vfs.write_file(self.__ATTACHMENT_FOLDER + attachment_info.file_name, data)
 
             self.__tracer.trace("[{}/{}] Downloaded attachment '{}'... ".format(
                 idx+1, len(attachment_infos), attachment_info.file_name))
 
-    def download_attachments(self, zip_file_path):
-        """ Downloads all the attachments of the current Todoist backup ZIP file
-            and packs them in a folder 'attachments' to the same ZIP """
+    def download_attachments(self, vfs):
+        """ Downloads all the attachments of the current Todoist backup VFS
+            and packs them in a folder 'attachments' to the same VFS """
 
-        with zipfile.ZipFile(zip_file_path, 'a') as zip_file:
-            # Ensure that we haven't already processed this file...
-            if any(name.startswith(self.__ATTACHMENT_FOLDER) for name in zip_file.namelist()):
-                self.__tracer.trace("File already has attachments folder, skipping.")
-                return
+        # Ensure that we haven't already processed this file...
+        if any(name.startswith(self.__ATTACHMENT_FOLDER) for name in vfs.file_list()):
+            self.__tracer.trace("File already has attachments folder, skipping.")
+            return
 
-            # Fetch the information of all the attachments
-            attachment_infos = self.__fetch_attachment_infos_from_zip(zip_file)
-            self.__tracer.trace("Found {} attachments.".format(len(attachment_infos)))
-            self.__deduplicate_attachments_names(attachment_infos)
-            self.__download_and_pack_attachments(attachment_infos, zip_file)
+        # Fetch the information of all the attachments
+        attachment_infos = self.__fetch_attachment_infos(vfs)
+        self.__tracer.trace("Found {} attachments.".format(len(attachment_infos)))
+        self.__deduplicate_attachments_names(attachment_infos)
+        self.__download_and_pack_attachments(attachment_infos, vfs)
