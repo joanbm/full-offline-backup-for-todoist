@@ -12,12 +12,19 @@ from .test_util_memory_vfs import InMemoryVfs
 
 class TestTodoistBackupAttachmentsDownloader(unittest.TestCase):
     """ Tests for the Todoist backup + attachments downloader class """
+    _TEST_CSV_FILE_NAME = "My Test [123456789].csv"
+
+    _TEST_FILE_JPG_URL = "http://www.example.com/image.jpg"
+    _TEST_FILE_JPG_BYTES = "it's a JPG"
+
+    _TEST_ATTACHMENT_INI_URL = "http://www.example.com/file.ini"
+    _TEST_ATTACHMENT_INI_BYTES = "it's an INI"
 
     def setUp(self):
         """ Creates the sample instrastructure for the test """
         self.__urlmap = {
-            "http://www.example.com/image.jpg": "it's a PNG".encode(),
-            "http://www.example.com/file.ini": "it's a INI".encode(),
+            self._TEST_FILE_JPG_URL: self._TEST_FILE_JPG_BYTES.encode(),
+            self._TEST_ATTACHMENT_INI_URL: self._TEST_ATTACHMENT_INI_BYTES.encode(),
         }
         self.__fake_urldownloader = MagicMock(get=lambda url: self.__urlmap[url])
 
@@ -29,13 +36,13 @@ class TestTodoistBackupAttachmentsDownloader(unittest.TestCase):
         writer.writerow(["TYPE", "CONTENT", "PRIORITY"])
         writer.writerow(["task", "This is a random task", "4"])
         writer.writerow(["note", " [[file {}]]".format(json.dumps({
-            "file_type": "image/png",
-            "file_name": "this/is/an/image.png",
-            "file_url": "http://www.example.com/image.jpg"
+            "file_type": "image/jpg",
+            "file_name": "this/is/an/image.jpg",
+            "file_url": self._TEST_FILE_JPG_URL
         })), "test"])
 
         vfs = InMemoryVfs()
-        vfs.write_file("My Test [123456789].csv", output.getvalue().encode())
+        vfs.write_file(self._TEST_CSV_FILE_NAME, output.getvalue().encode())
 
         backup_downloader = TodoistBackupAttachmentsDownloader(
             NullTracer(), self.__fake_urldownloader)
@@ -44,9 +51,35 @@ class TestTodoistBackupAttachmentsDownloader(unittest.TestCase):
         backup_downloader.download_attachments(vfs)
 
         # Assert
-        self.assertIn("attachments/this_is_an_image.png", vfs.file_list())
-        self.assertEqual(vfs.read_file("attachments/this_is_an_image.png").decode(),
-                         "it's a PNG")
+        self.assertIn("attachments/this_is_an_image.jpg", vfs.file_list())
+        self.assertEqual(vfs.read_file("attachments/this_is_an_image.jpg").decode(),
+                         self._TEST_FILE_JPG_BYTES)
+
+    def test_on_file_only_link_no_name_doesnt_crash_or_download_anything(self):
+        """ Does a basic test with a note that contains a list
+            (which is stored as a file, but without a file name or URL) """
+        # Arrange
+        output = io.StringIO()
+        writer = csv.writer(output, quoting=csv.QUOTE_NONNUMERIC)
+        writer.writerow(["TYPE", "CONTENT", "PRIORITY"])
+        writer.writerow(["task", "How to shoot on iPhone 7", "4"])
+        writer.writerow(["note", " [[file {}]]".format(json.dumps({
+            "site_name": "Apple",
+            "title": "How to shoot on iPhone - Photography",
+            "url": "https://www.apple.com/iphone/photography-how-to/"
+        })), "test"])
+
+        vfs = InMemoryVfs()
+        vfs.write_file(self._TEST_CSV_FILE_NAME, output.getvalue().encode())
+
+        backup_downloader = TodoistBackupAttachmentsDownloader(
+            NullTracer(), self.__fake_urldownloader)
+
+        # Act
+        backup_downloader.download_attachments(vfs)
+
+        # Assert
+        self.assertEqual(vfs.file_list(), [self._TEST_CSV_FILE_NAME])
 
     def test_filename_with_slash_is_sanitized(self):
         """ Tests that a filename containing a slash in sanitized before ZIPing it
@@ -57,21 +90,21 @@ class TestTodoistBackupAttachmentsDownloader(unittest.TestCase):
         writer.writerow(["TYPE", "CONTENT", "PRIORITY"])
         writer.writerow(["task", "This is a random task", "4"])
         writer.writerow(["note", " [[file {}]]".format(json.dumps({
-            "file_type": "image/png",
-            "file_name": "image.png",
-            "file_url": "http://www.example.com/image.jpg"
+            "file_type": "image/jpg",
+            "file_name": "image.jpg",
+            "file_url": self._TEST_FILE_JPG_URL
         })), "test"])
 
         writer.writerow(["task", "This is another random task", "4"])
         writer.writerow(["note", " [[file {}]]".format(json.dumps({
-            "file_type": "image/png",
+            "file_type": "image/jpg",
             "file_name": "file.ini",
-            "file_url": "http://www.example.com/file.ini"
+            "file_url": self._TEST_ATTACHMENT_INI_URL
         })), "test"])
         writer.writerow(["", "", ""])
 
         vfs = InMemoryVfs()
-        vfs.write_file("My Test [123456789].csv", output.getvalue().encode())
+        vfs.write_file(self._TEST_CSV_FILE_NAME, output.getvalue().encode())
 
         backup_downloader = TodoistBackupAttachmentsDownloader(
             NullTracer(), self.__fake_urldownloader)
@@ -80,17 +113,30 @@ class TestTodoistBackupAttachmentsDownloader(unittest.TestCase):
         backup_downloader.download_attachments(vfs)
 
         # Assert
-        self.assertIn("attachments/image.png", vfs.file_list())
+        self.assertIn("attachments/image.jpg", vfs.file_list())
         self.assertIn("attachments/file.ini", vfs.file_list())
-        self.assertEqual(vfs.read_file("attachments/image.png").decode(), "it's a PNG")
-        self.assertEqual(vfs.read_file("attachments/file.ini").decode(), "it's a INI")
+        self.assertEqual(vfs.read_file("attachments/image.jpg").decode(), self._TEST_FILE_JPG_BYTES)
+        self.assertEqual(vfs.read_file("attachments/file.ini").decode(),
+                         self._TEST_ATTACHMENT_INI_BYTES)
 
     def test_on_download_with_already_downloaded_doesnt_overwrite(self):
         """ Does a test where an attachment has already been downloaded,
             to ensure it is not downloaded again """
         # Arrange
-        vfs_mock = MagicMock()
-        vfs_mock.existed.return_value = True
+        output = io.StringIO()
+        writer = csv.writer(output, quoting=csv.QUOTE_NONNUMERIC)
+        writer.writerow(["TYPE", "CONTENT", "PRIORITY"])
+        writer.writerow(["task", "This is a random task", "4"])
+        writer.writerow(["note", " [[file {}]]".format(json.dumps({
+            "file_type": "image/jpg",
+            "file_name": "image.jpg",
+            "file_url": self._TEST_FILE_JPG_URL
+        })), "test"])
+
+        vfs = InMemoryVfs()
+        vfs.write_file(self._TEST_CSV_FILE_NAME, output.getvalue().encode())
+        vfs.write_file("attachments/image.jpg", self._TEST_FILE_JPG_BYTES)
+        vfs_mock = MagicMock(wraps=vfs)
 
         backup_downloader = TodoistBackupAttachmentsDownloader(
             NullTracer(), self.__fake_urldownloader)
@@ -111,21 +157,21 @@ class TestTodoistBackupAttachmentsDownloader(unittest.TestCase):
         writer.writerow(["TYPE", "CONTENT", "PRIORITY"])
         writer.writerow(["task", "This is a random task", "4"])
         writer.writerow(["note", " [[file {}]]".format(json.dumps({
-            "file_type": "image/png",
-            "file_name": "image.png",
-            "file_url": "http://www.example.com/image.jpg"
+            "file_type": "image/jpg",
+            "file_name": "image.jpg",
+            "file_url": self._TEST_FILE_JPG_URL
         })), "test"])
 
         writer.writerow(["task", "This is another random task", "4"])
         writer.writerow(["note", " [[file {}]]".format(json.dumps({
-            "file_type": "image/png",
-            "file_name": "image.png",
-            "file_url": "http://www.example.com/file.ini"
+            "file_type": "image/jpg",
+            "file_name": "image.jpg",
+            "file_url": self._TEST_ATTACHMENT_INI_URL
         })), "test"])
         writer.writerow(["", "", ""])
 
         vfs = InMemoryVfs()
-        vfs.write_file("My Test [123456789].csv", output.getvalue().encode())
+        vfs.write_file(self._TEST_CSV_FILE_NAME, output.getvalue().encode())
 
         backup_downloader = TodoistBackupAttachmentsDownloader(
             NullTracer(), self.__fake_urldownloader)
@@ -134,7 +180,8 @@ class TestTodoistBackupAttachmentsDownloader(unittest.TestCase):
         backup_downloader.download_attachments(vfs)
 
         # Assert
-        self.assertIn("attachments/image.png", vfs.file_list())
-        self.assertIn("attachments/image_2.png", vfs.file_list())
-        self.assertEqual(vfs.read_file("attachments/image.png").decode(), "it's a PNG")
-        self.assertEqual(vfs.read_file("attachments/image_2.png").decode(), "it's a INI")
+        self.assertIn("attachments/image.jpg", vfs.file_list())
+        self.assertIn("attachments/image_2.jpg", vfs.file_list())
+        self.assertEqual(vfs.read_file("attachments/image.jpg").decode(), self._TEST_FILE_JPG_BYTES)
+        self.assertEqual(vfs.read_file("attachments/image_2.jpg").decode(),
+                         self._TEST_ATTACHMENT_INI_BYTES)

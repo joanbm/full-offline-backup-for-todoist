@@ -13,27 +13,22 @@ class VirtualFs(object, metaclass=ABCMeta):
     @abstractmethod
     def set_path_hint(self, dst_path):
         """ Sets the associated physical path of this filesystem (if possible) """
-        pass
 
     @abstractmethod
     def existed(self):
         """ Checks if the filesystem previously existed, or is newly created """
-        pass
 
     @abstractmethod
     def file_list(self):
         """ Gets the list of files in this virtual file system """
-        pass
 
     @abstractmethod
     def read_file(self, file_path):
         """ Reads a file from this virtual file system """
-        pass
 
     @abstractmethod
     def write_file(self, file_path, file_data):
         """ Adds a file to the filesystem """
-        pass
 
 class ZipVirtualFs(VirtualFs):
     """ Represents a virtual filesystem over a ZIP file """
