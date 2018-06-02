@@ -21,24 +21,16 @@ class ConsoleFrontend:
                                  help="file containing the todoist API token")
 
     def __parse_command_line_args(self, prog, arguments):
-        example1_str = "Example: {} download LATEST --token 0123456789abcdef".format(prog)
-        example2_str = "         {} --verbose list --token 0123456789abcdef".format(prog)
+        example1_str = "Example: {} download --token 0123456789abcdef".format(prog)
         parser = argparse.ArgumentParser(prog=prog, formatter_class=argparse.RawTextHelpFormatter,
-                                         epilog=example1_str + '\r\n' + example2_str)
+                                         epilog=example1_str)
         parser.add_argument("--verbose", action="store_true", help="print details to console")
         subparsers = parser.add_subparsers(dest='action')
         subparsers.required = True
 
-        # create the parser for the "list" command
-        parser_list = subparsers.add_parser('list', help='list available backups')
-        parser_list.set_defaults(func=self.handle_list)
-        self.__add_token_group(parser_list)
-
         # create the parser for the "download" command
         parser_download = subparsers.add_parser('download', help='download specified backup')
         parser_download.set_defaults(func=self.handle_download)
-        parser_download.add_argument("version", type=str, metavar="VERSIONSPEC|LATEST",
-                                     help="backup version to download, or LATEST")
         parser_download.add_argument("--with-attachments", action="store_true",
                                      help="download attachments and attach to the backup file")
         parser_download.add_argument("--output-file", type=str,
@@ -59,20 +51,6 @@ class ConsoleFrontend:
 
         return args.token
 
-    def handle_list(self, args):
-        """ Handles the list subparser with the specified command line arguments """
-        # Configure controller
-        token = self.__get_token(args)
-        dependencies = self.__controller_dependencies_factory(token, args.verbose)
-        controller = self.__controller_factory(dependencies)
-
-        # Execute requested action
-        (backups, latest_backup) = controller.get_backups()
-        print("{:<30} | {}".format("VERSION", "URL"))
-        for backup in backups:
-            is_latest_str = " (LATEST)" if backup == latest_backup else ""
-            print("{:<30} | {}".format(backup.version + is_latest_str, backup.url))
-
     def handle_download(self, args):
         """ Handles the download subparser with the specified command line arguments """
 
@@ -84,8 +62,4 @@ class ConsoleFrontend:
         # Setup zip virtual fs
         with ZipVirtualFs(args.output_file) as zipvfs:
             # Execute requested action
-            if args.version == 'LATEST':
-                controller.download_latest(zipvfs, with_attachments=args.with_attachments)
-            else:
-                controller.download_version(args.version, zipvfs,
-                                            with_attachments=args.with_attachments)
+            controller.download(zipvfs, with_attachments=args.with_attachments)

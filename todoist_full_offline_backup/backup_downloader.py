@@ -1,44 +1,35 @@
 #!/usr/bin/python3
 """ Class to download Todoist backup ZIPs using the Todoist API """
-import zipfile
-import io
+import datetime
 from .utils import sanitize_file_name
 
 class TodoistBackupDownloader:
     """ Class to download Todoist backup ZIPs using the Todoist API """
     __ZIP_FLAG_BITS_UTF8 = 0x800
 
-    def __init__(self, tracer, urldownloader):
+    def __init__(self, tracer, todoist_api):
         self.__tracer = tracer
-        self.__urldownloader = urldownloader
+        self.__todoist_api = todoist_api
 
-    def download(self, backup, vfs):
-        """ Downloads the specified backup to the specified folder """
-        self.__tracer.trace("Downloading backup with version '{}'".format(backup.version))
+    def download(self, vfs):
+        """ Generates a Todoist backup and saves it to the given VFS """
+        self.__tracer.trace("Generating backup from current Todoist status")
 
         # Sanitize the file name for platforms such as Windows,
         # which don't accept some characters in file names, such as a colon (:)
-        vfs.set_path_hint(sanitize_file_name("TodoistBackup_" + backup.version))
+        backup_version = datetime.datetime.utcnow().replace(microsecond=0).isoformat(' ')
+        vfs.set_path_hint(sanitize_file_name("TodoistBackup_" + backup_version))
 
         # Download the file
         if vfs.existed():
             self.__tracer.trace("File already downloaded... skipping")
             return
 
-        self.__tracer.trace("Downloading from {}...".format(
-            backup.url))
-        raw_zip_bytes = self.__urldownloader.get(backup.url)
-        with zipfile.ZipFile(io.BytesIO(raw_zip_bytes), "r") as zipf:
-            for info in zipf.infolist():
-                # Todoist backup ZIPs may contain filenames encoded in UTF-8, but they will not
-                # actually have the UTF-8 filename flag set in the ZIP file.
-                # This causes some ZIP parsers, such as Python's own parser, to consider the
-                # file names in the legacy CP-437 format.
-                # To fix this, let's re-encode the filenames in CP-437 to get the original
-                # bytes back, then properly decode them to UTF-8.
-                if info.flag_bits & self.__ZIP_FLAG_BITS_UTF8:
-                    encoding_file_name = info.filename
-                else:
-                    encoding_file_name = info.filename.encode('cp437').decode("utf-8")
+        self.__tracer.trace("Downloading project list from todoist API...")
+        projects = self.__todoist_api.get_projects()
 
-                vfs.write_file(encoding_file_name, zipf.read(info.filename))
+        for project in projects:
+            export_csv_file_name = "{} [{}].csv".format(
+                sanitize_file_name(project.name), project.identifier)
+            export_csv_file_content = self.__todoist_api.export_project_as_csv(project)
+            vfs.write_file(export_csv_file_name, export_csv_file_content)

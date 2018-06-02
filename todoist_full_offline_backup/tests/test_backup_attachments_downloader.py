@@ -37,7 +37,7 @@ class TestTodoistBackupAttachmentsDownloader(unittest.TestCase):
         writer.writerow(["task", "This is a random task", "4"])
         writer.writerow(["note", " [[file {}]]".format(json.dumps({
             "file_type": "image/jpg",
-            "file_name": "this/is/an/image.jpg",
+            "file_name": "this_is_an_image.jpg",
             "file_url": self._TEST_FILE_JPG_URL
         })), "test"])
 

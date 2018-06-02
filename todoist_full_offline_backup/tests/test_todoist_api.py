@@ -3,69 +3,70 @@
 # pylint: disable=invalid-name
 import unittest
 from unittest.mock import MagicMock, ANY
-import datetime
 from ..todoist_api import TodoistApi
 from ..tracer import NullTracer
 
 class TestTodoistApi(unittest.TestCase):
     """ Tests for the Todoist API wrapper """
 
-    def test_on_empty_json_returns_empty_list(self):
-        """ Tests that when the operation to get the backups returns an empty JSON list,
-            an empty list of backups is returned """
+    def test_on_empty_projects_json_returns_empty_list(self):
+        """ Tests that when the operation to get the projects returns an empty JSON list,
+            an empty list of projects is returned """
         # Arrange
         mock_urldownloader = MagicMock()
-        mock_urldownloader.get.return_value = "[]".encode()
+        mock_urldownloader.get.return_value = '{"projects": []}'.encode()
 
         # Act
-        backups = TodoistApi("FAKE_TOKEN", NullTracer(), mock_urldownloader).get_backups()
+        projects = TodoistApi("FAKE_TOKEN", NullTracer(), mock_urldownloader).get_projects()
 
         # Assert
-        self.assertEqual(len(backups), 0)
+        self.assertEqual(len(projects), 0)
 
-    def test_on_valid_json_returns_associated_backups(self):
-        """ Tests that when the operation to get the backups returns a valid JSON list,
-            the correct list of backups is returned """
+    def test_on_valid_projects_json_returns_associated_projects(self):
+        """ Tests that when the operation to get the projects returns a valid JSON list,
+            the correct list of projects is returned """
 
         # Arrange
         mock_urldownloader = MagicMock()
-        mock_urldownloader.get.return_value = """[
-            {"version":"2016-01-13 02:03","url":"https://www.example.com/1.zip"},
-            {"version":"2016-01-12 06:03","url":"https://www.example.com/2.zip"}
-        ]""".encode()
+        mock_urldownloader.get.return_value = """{ "projects" : [
+            { "id" : 2181147711, "name" : "Not Work" },
+            { "id" : 2181147713, "name" : "Work" }
+        ]}""".encode()
 
         todoist_api = TodoistApi("FAKE_TOKEN", NullTracer(), mock_urldownloader)
 
         # Act
-        backups = todoist_api.get_backups()
+        projects = todoist_api.get_projects()
 
         # Assert
-        self.assertEqual(len(backups), 2)
-        self.assertEqual(backups[0].version, "2016-01-13 02:03")
-        self.assertEqual(backups[0].version_date, datetime.datetime(2016, 1, 13, 2, 3))
-        self.assertEqual(backups[0].url, "https://www.example.com/1.zip")
+        self.assertEqual(len(projects), 2)
+        self.assertEqual(projects[0].identifier, 2181147711)
+        self.assertEqual(projects[0].name, "Not Work")
 
-        self.assertEqual(backups[1].version, "2016-01-12 06:03")
-        self.assertEqual(backups[1].version_date, datetime.datetime(2016, 1, 12, 6, 3))
-        self.assertEqual(backups[1].url, "https://www.example.com/2.zip")
+        self.assertEqual(projects[1].identifier, 2181147713)
+        self.assertEqual(projects[1].name, "Work")
 
     @staticmethod
-    def test_on_call_with_token_calls_download_with_token():
+    def test_on_call_get_projects_with_token_calls_download_with_token():
         """ Tests that the token is correctly URL encoded when using the Todoist API """
 
         # Arrange
         mock_urldownloader = MagicMock()
-        mock_urldownloader.get.return_value = "[]".encode()
+        mock_urldownloader.get.return_value = '{"projects": []}'.encode()
 
         todoist_api = TodoistApi("FAKE TOKEN", NullTracer(), mock_urldownloader)
 
         # Act
-        todoist_api.get_backups()
+        todoist_api.get_projects()
 
         # Assert
-        mock_urldownloader.get.assert_called_with(ANY, {'token': 'FAKE TOKEN'})
+        mock_urldownloader.get.assert_called_with(ANY, {
+            'token': 'FAKE TOKEN',
+            'sync_token': '*',
+            'resource_types': '["projects"]'
+        })
 
-    def test_on_invalid_json_throws_exception(self):
+    def test_on_invalid_projects_json_throws_exception(self):
         """ Tests that an exception is thrown when the Todoist API returns an invalid JSON """
 
         # Arrange
@@ -75,9 +76,9 @@ class TestTodoistApi(unittest.TestCase):
         todoist_api = TodoistApi("FAKE_TOKEN", NullTracer(), mock_urldownloader)
 
         # Act/Assert
-        self.assertRaises(Exception, todoist_api.get_backups)
+        self.assertRaises(Exception, todoist_api.get_projects)
 
-    def test_on_http_fail_throws_exception(self):
+    def test_on_projects_http_fail_throws_exception(self):
         """ Tests that an exception is thrown on a HTTP error when using the Todoist API """
 
         # Arrange
@@ -87,4 +88,4 @@ class TestTodoistApi(unittest.TestCase):
         todoist_api = TodoistApi("FAKE_TOKEN", NullTracer(), mock_urldownloader)
 
         # Act/Assert
-        self.assertRaises(Exception, todoist_api.get_backups)
+        self.assertRaises(Exception, todoist_api.get_projects)

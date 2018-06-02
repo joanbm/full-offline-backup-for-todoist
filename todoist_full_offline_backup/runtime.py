@@ -15,18 +15,14 @@ class RuntimeControllerDependencyInjector(ControllerDependencyInjector):
         super(RuntimeControllerDependencyInjector, self).__init__(token, verbose)
         self.__tracer = ConsoleTracer() if verbose else NullTracer()
         urldownloader = URLLibURLDownloader()
-        self.__todoist_api = TodoistApi(token, self.__tracer, urldownloader)
-        self.__backup_downloader = TodoistBackupDownloader(self.__tracer, urldownloader)
+        todoist_api = TodoistApi(token, self.__tracer, urldownloader)
+        self.__backup_downloader = TodoistBackupDownloader(self.__tracer, todoist_api)
         self.__backup_attachments_downloader = TodoistBackupAttachmentsDownloader(
             self.__tracer, urldownloader)
 
     @property
     def tracer(self):
         return self.__tracer
-
-    @property
-    def todoist_api(self):
-        return self.__todoist_api
 
     @property
     def backup_downloader(self):

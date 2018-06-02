@@ -1,0 +1,91 @@
+{
+    "projects" : [
+        {
+            "is_archived" : 0,
+            "color" : 7,
+            "shared" : false,
+            "inbox_project" : true,
+            "id" : 2181147955,
+            "collapsed" : 0,
+            "item_order" : 0,
+            "name" : "🦋 butterflies list",
+            "is_deleted" : 0,
+            "indent" : 1
+        },
+        {
+            "is_archived" : 0,
+            "color" : 7,
+            "shared" : false,
+            "inbox_project" : true,
+            "id" : 2181147714,
+            "collapsed" : 0,
+            "item_order" : 0,
+            "name" : "Errands",
+            "is_deleted" : 0,
+            "indent" : 1
+        },
+        {
+            "is_archived" : 0,
+            "color" : 7,
+            "shared" : false,
+            "inbox_project" : true,
+            "id" : 2181147709,
+            "collapsed" : 0,
+            "item_order" : 0,
+            "name" : "Inbox",
+            "is_deleted" : 0,
+            "indent" : 1
+        },
+        {
+            "is_archived" : 0,
+            "color" : 7,
+            "shared" : false,
+            "inbox_project" : true,
+            "id" : 2181147715,
+            "collapsed" : 0,
+            "item_order" : 0,
+            "name" : "Movies to watch",
+            "is_deleted" : 0,
+            "indent" : 1
+        },
+        {
+            "is_archived" : 0,
+            "color" : 7,
+            "shared" : false,
+            "inbox_project" : true,
+            "id" : 2181147711,
+            "collapsed" : 0,
+            "item_order" : 0,
+            "name" : "Personal",
+            "is_deleted" : 0,
+            "indent" : 1
+        },
+        {
+            "is_archived" : 0,
+            "color" : 7,
+            "shared" : false,
+            "inbox_project" : true,
+            "id" : 2181147712,
+            "collapsed" : 0,
+            "item_order" : 0,
+            "name" : "Shopping",
+            "is_deleted" : 0,
+            "indent" : 1
+        },
+        {
+            "is_archived" : 0,
+            "color" : 7,
+            "shared" : false,
+            "inbox_project" : true,
+            "id" : 2181147713,
+            "collapsed" : 0,
+            "item_order" : 0,
+            "name" : "Work",
+            "is_deleted" : 0,
+            "indent" : 1
+        }
+    ],
+    "full_sync" : true,
+    "temp_id_mapping" : {},
+    "sync_token" : "aLGJg_2qwBE_kE3j9_Gn6uoKQtvQeyjm7UEz_aVwF8KdriDxw7e_InFZK61h"
+ }

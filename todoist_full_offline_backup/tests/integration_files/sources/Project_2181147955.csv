@@ -1,0 +1,4 @@
+﻿TYPE,CONTENT,PRIORITY,INDENT,AUTHOR,RESPONSIBLE,DATE,DATE_LANG,TIMEZONE
+task,this task has a 🐛 in its name!!!,4,1,test_integration_test (16542905),,,en,Europe/Madrid
+note," [[file {""file_size"":28,""file_type"":""text\/plain"",""file_name"":""bug.txt"",""upload_state"":""completed"",""file_url"":""https:\/\/d1x0mwiac2rqwt.cloudfront.net\/g75-kL8pwVYNObSczLnVXe4FIyJd8YQL6b8yCilGyix09bMdJmxbtrGMW9jIeIwJ\/by\/16542905\/as\/bug.txt"",""resource_type"":""file""}]]",,,test_integration_test (16542905),,,,
+,,,,,,,,
