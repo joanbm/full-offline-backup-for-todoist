@@ -2,7 +2,7 @@ root
 app.zip
 python.asm.js
 python.asm.data
-app/todoist_full_offline_backup
+app/full_offline_backup_for_todoist
 main.bc
 js.bc
 cpython-emscripten

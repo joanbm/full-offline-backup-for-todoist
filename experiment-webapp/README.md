@@ -1,4 +1,4 @@
-This is an experiment of porting todoist-full-offline-backup to the web (purely client-side), through cpython-emscripten, a port of CPython to the browser.
+This is an experiment of porting full-offline-backup-for-todoist to the web (purely client-side), through cpython-emscripten, a port of CPython to the browser.
 
 ## Requirements (possibly incomplete)
 

@@ -41,7 +41,7 @@ args = js.ask_command_line()
 sys.argv = shlex.split(args)
 
 # Finally, run the main function of the program
-from .todoist_full_offline_backup.__init__ import main # pylint: disable=E0402
+from .full_offline_backup_for_todoist.__init__ import main # pylint: disable=E0402
 main()
 
 # Finally! offer the downloaded backup to the user

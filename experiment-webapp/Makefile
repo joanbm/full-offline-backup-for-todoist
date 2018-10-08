@@ -26,7 +26,7 @@ python.asm.js: main.bc js.bc root
 
 
 app.zip: app
-	cp -R ../todoist_full_offline_backup app/todoist_full_offline_backup
+	cp -R ../full_offline_backup_for_todoist app/full_offline_backup_for_todoist
 	if [ -e $@ ]; then rm $@; fi
 	zip -r $@ $<
 
@@ -42,7 +42,7 @@ clean:
 	-rm -fr root
 	-rm -f python.asm.js python.asm.data	
 	-rm -f *.bc
-	-rm -fr app/todoist_full_offline_backup
+	-rm -fr app/full_offline_backup_for_todoist
 	-rm -f app.zip
 
 

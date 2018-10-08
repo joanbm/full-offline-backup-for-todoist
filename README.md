@@ -1,8 +1,8 @@
-# todoist-full-offline-backup
+# full-offline-backup-for-todoist
 
-[![Build Status](https://travis-ci.org/joanbm/todoist-full-offline-backup.svg?branch=master)](https://travis-ci.org/joanbm/todoist-full-offline-backup)
+[![Build Status](https://travis-ci.org/joanbm/full-offline-backup-for-todoist.svg?branch=master)](https://travis-ci.org/joanbm/full-offline-backup-for-todoist)
 
-[![Coverage Status](https://coveralls.io/repos/github/joanbm/todoist-full-offline-backup/badge.svg)](https://coveralls.io/github/joanbm/todoist-full-offline-backup)
+[![Coverage Status](https://coveralls.io/repos/github/joanbm/full-offline-backup-for-todoist/badge.svg)](https://coveralls.io/github/joanbm/full-offline-backup-for-todoist)
 
 ## Quick description
 
@@ -61,3 +61,7 @@ Print full help:
 ## How to get my Todoist API token?
 
 The easiest way to get one is to open the **web version of Todoist**, go to the **Settings** section, then to the **Integrations** sections and you will see a API token there in the **"Token API"** section.
+
+# Disclaimer
+
+This is **NOT** an official application. This application is not created by, affiliated with, or supported by Doist.
