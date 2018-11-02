@@ -44,13 +44,9 @@ Create a backup from Todoist's servers, including attachments:
 
 ``python3 __main__.py download --with-attachments --token 0123456789abcdef``
 
-Download a specific backup from Todoist's servers, including attachments, and with tracing/progress info:
+Create a backup from Todoist's servers, without including attachments, and with tracing/progress info:
 
 ``python3 __main__.py --verbose download --token 0123456789abcdef``
-
-List available backups:
-
-``python3 __main__.py list --token 0123456789abcdef``
 
 Print full help:
 

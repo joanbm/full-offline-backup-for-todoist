@@ -13,7 +13,7 @@ class TestRuntime(unittest.TestCase):
         # Arrange
 
         # Act
-        runtimedi = RuntimeControllerDependencyInjector("1234", True)
+        runtimedi = RuntimeControllerDependencyInjector({"token":"1234"}, False)
         tracer1 = runtimedi.tracer
         tracer2 = runtimedi.tracer
         backup_downloader1 = runtimedi.backup_downloader

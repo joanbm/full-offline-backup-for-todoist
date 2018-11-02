@@ -7,7 +7,7 @@ class ControllerDependencyInjector(object, metaclass=ABCMeta):
     """ Rudimentary dependency injection container for the controller """
 
     @abstractmethod
-    def __init__(self, token, verbose):
+    def __init__(self, auth, verbose):
         """ Initializes the dependencies according to the user configuration """
 
     @property
