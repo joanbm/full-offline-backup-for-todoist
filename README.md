@@ -24,9 +24,7 @@ This tool aims to allow you to make a complete backup, including all attachments
 
 * Can download all attachments of the tasks associated to your Todoist backup.
 
-* Automatically fixes Todoist backup ZIPs when you have projects that contain non-ASCII characters (i.e. Unicode characters like 💓) so they can be correctly handled by ZIP tools.
-
-* Can list all available backups through the Todoist API.
+* Unlike Todoist's automatic backup ZIPs, valid ZIPs are generated  when you have projects that contain non-ASCII characters (i.e. Unicode characters like 💓) so they can be correctly handled by ZIP tools.
 
 * Can be easily automated to download your backups periodically.
 
