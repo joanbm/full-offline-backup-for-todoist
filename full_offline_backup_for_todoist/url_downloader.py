@@ -5,7 +5,7 @@ import urllib.request
 import urllib.parse
 import http.cookiejar
 
-class URLDownloader(object, metaclass=ABCMeta):
+class URLDownloader(metaclass=ABCMeta):
     """ Implementation of a class to download the contents of an URL """
 
     @abstractmethod
@@ -28,13 +28,12 @@ class TodoistAuthURLDownloader(URLDownloader):
     """ Implementation of a class to download the contents of an URL through URLLib,
         authenticating before with Todoist's servers using a username/password """
 
-    URL_SHOWLOGIN='https://todoist.com/Users/showLogin'
-    URL_POSTLOGIN='https://todoist.com/Users/login'
-    URL_FILE_TO_DOWNLOAD="https://files.todoist.com/VxxTiO9w6TCd_gHiHxpovh3oLL71OllvLxXFgv70jhxJkMSuu6veoX7fVnasbZpc/by/15956439/as/IMG_3285.JPG"
+    URL_SHOWLOGIN = 'https://todoist.com/Users/showLogin'
+    URL_POSTLOGIN = 'https://todoist.com/Users/login'
 
-    LOGIN_PARAM_CSRF="csrf"
-    LOGIN_PARAM_EMAIL="email"
-    LOGIN_PARAM_PASSWORD="password"
+    LOGIN_PARAM_CSRF = "csrf"
+    LOGIN_PARAM_EMAIL = "email"
+    LOGIN_PARAM_PASSWORD = "password"
 
     def __init__(self, tracer, email, password):
         self.__tracer = tracer
@@ -52,13 +51,14 @@ class TodoistAuthURLDownloader(URLDownloader):
             self.__tracer.trace("Auth Step 1: Get CSRF token")
 
             # Ping the login page, in order to get a CSRF token as a cookie
-            with self.__opener.open(TodoistAuthURLDownloader.URL_SHOWLOGIN) as get_csrf_response:
+            with self.__opener.open(TodoistAuthURLDownloader.URL_SHOWLOGIN) as _:
                 pass
 
             self.__tracer.trace("Auth Step 2: Building login request params")
 
             # Build the parameters (CSRF, email and password) for the login POST request
-            csrf_value = next(c.value for c in cookiejar if c.name == TodoistAuthURLDownloader.LOGIN_PARAM_CSRF)
+            csrf_value = next(c.value for c in cookiejar
+                              if c.name == TodoistAuthURLDownloader.LOGIN_PARAM_CSRF)
             params = {
                 TodoistAuthURLDownloader.LOGIN_PARAM_CSRF: csrf_value,
                 TodoistAuthURLDownloader.LOGIN_PARAM_EMAIL: self.__email,
@@ -68,7 +68,7 @@ class TodoistAuthURLDownloader(URLDownloader):
             self.__tracer.trace("Auth Step 3: Send login request")
 
             # Send the login POST request, which will give us our identifier cookie
-            with self.__opener.open(TodoistAuthURLDownloader.URL_POSTLOGIN, params_str) as login_response:
+            with self.__opener.open(TodoistAuthURLDownloader.URL_POSTLOGIN, params_str) as _:
                 pass
 
             self.__tracer.trace("Auth completed")

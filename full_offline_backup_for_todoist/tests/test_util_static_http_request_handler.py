@@ -27,7 +27,6 @@ class TestStaticHTTPServer:
 
             def log_message(self, format, *args): # pylint: disable=redefined-builtin
                 """ Disables console output for the HTTP Request Handler """
-                pass
 
             def do_GET(self): # pylint: disable=invalid-name
                 """ Handles a request using the defined static mapping """
@@ -38,6 +37,5 @@ class TestStaticHTTPServer:
 
                 if self.path in route_responses:
                     self.wfile.write(route_responses[self.path])
-                return
 
         return TestHTTPRequestHandler

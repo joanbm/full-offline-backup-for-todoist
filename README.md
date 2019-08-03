@@ -38,19 +38,21 @@ Early version - enough for basic use, but not tested under every possible scenar
 
 ## Usage examples
 
-Create a backup from Todoist's servers, including attachments:
+Create a backup from Todoist's servers, without including attachments:
 
-``python3 __main__.py download --with-attachments --token 0123456789abcdef``
+``python3 __main__.py download --token 0123456789abcdef``
 
-Create a backup from Todoist's servers, without including attachments, and with tracing/progress info:
+Create a backup from Todoist's servers, including attachments, and with tracing/progress info:
 
-``python3 __main__.py --verbose download --token 0123456789abcdef``
+``python3 __main__.py --verbose download --with-attachments --token 0123456789abcdef --email myemail@example.com --password P4ssW0rD``
+
+**NOTE:** The email and password is **required** to download the attachments, as a workaround due to security restriction introduced by Todoist in 2018 (see [issue #1](https://github.com/joanbm/full-offline-backup-for-todoist/issues/1)). As of today, there is no official way provided by Todoist to automate attachment download, and the current workaround may break at any time.
 
 Print full help:
 
 ``python3 __main__.py -h``
 
-**IMPORTANT:** To use this tool you will need to replace the "0123456789abcdef" string above with your Todoist API token.
+**IMPORTANT:** To use this tool you will need to replace the "0123456789abcdef" string above with your Todoist API token (and similarly for your email and password).
 
 ## How to get my Todoist API token?
 

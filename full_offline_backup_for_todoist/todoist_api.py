@@ -13,8 +13,9 @@ class TodoistProjectInfo:
 class TodoistApi:
     """ Provides access to a subset of the features of the Todoist API"""
 
-    __SYNC_ENDPOINT = "https://todoist.com/api/v7/sync"
-    __EXPORT_PROJECT_AS_CSV_FILE_ENDPOINT = "https://todoist.com/api/v7/templates/export_as_file"
+    __BASE_URL = "https://api.todoist.com/sync/v8"
+    __SYNC_ENDPOINT = __BASE_URL + "/sync"
+    __EXPORT_PROJECT_AS_CSV_FILE_ENDPOINT = __BASE_URL + "/templates/export_as_file"
 
     def __init__(self, api_token, tracer, urldownloader):
         self.__api_token = api_token

@@ -3,7 +3,7 @@
 
 from abc import ABCMeta, abstractmethod
 
-class ControllerDependencyInjector(object, metaclass=ABCMeta):
+class ControllerDependencyInjector(metaclass=ABCMeta):
     """ Rudimentary dependency injection container for the controller """
 
     @abstractmethod

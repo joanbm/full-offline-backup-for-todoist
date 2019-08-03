@@ -29,21 +29,21 @@ class TestIntegration(unittest.TestCase):
         # Set up the fake HTTP server with local responses
         # pylint: disable=line-too-long
         route_responses = {
-            "/https://todoist.com/api/v7/sync?token=mysecrettoken&sync_token=%2A&resource_types=%5B%22projects%22%5D":
+            "/https://api.todoist.com/sync/v8/sync?token=mysecrettoken&sync_token=%2A&resource_types=%5B%22projects%22%5D":
                 Path(self.__get_test_file("sources/project_list.json")).read_bytes(),
-            "/https://todoist.com/api/v7/templates/export_as_file?token=mysecrettoken&project_id=2181147955":
+            "/https://api.todoist.com/sync/v8/templates/export_as_file?token=mysecrettoken&project_id=2181147955":
                 Path(self.__get_test_file("sources/Project_2181147955.csv")).read_bytes(),
-            "/https://todoist.com/api/v7/templates/export_as_file?token=mysecrettoken&project_id=2181147714":
+            "/https://api.todoist.com/sync/v8/templates/export_as_file?token=mysecrettoken&project_id=2181147714":
                 Path(self.__get_test_file("sources/Project_2181147714.csv")).read_bytes(),
-            "/https://todoist.com/api/v7/templates/export_as_file?token=mysecrettoken&project_id=2181147709":
+            "/https://api.todoist.com/sync/v8/templates/export_as_file?token=mysecrettoken&project_id=2181147709":
                 Path(self.__get_test_file("sources/Project_2181147709.csv")).read_bytes(),
-            "/https://todoist.com/api/v7/templates/export_as_file?token=mysecrettoken&project_id=2181147715":
+            "/https://api.todoist.com/sync/v8/templates/export_as_file?token=mysecrettoken&project_id=2181147715":
                 Path(self.__get_test_file("sources/Project_2181147715.csv")).read_bytes(),
-            "/https://todoist.com/api/v7/templates/export_as_file?token=mysecrettoken&project_id=2181147711":
+            "/https://api.todoist.com/sync/v8/templates/export_as_file?token=mysecrettoken&project_id=2181147711":
                 Path(self.__get_test_file("sources/Project_2181147711.csv")).read_bytes(),
-            "/https://todoist.com/api/v7/templates/export_as_file?token=mysecrettoken&project_id=2181147712":
+            "/https://api.todoist.com/sync/v8/templates/export_as_file?token=mysecrettoken&project_id=2181147712":
                 Path(self.__get_test_file("sources/Project_2181147712.csv")).read_bytes(),
-            "/https://todoist.com/api/v7/templates/export_as_file?token=mysecrettoken&project_id=2181147713":
+            "/https://api.todoist.com/sync/v8/templates/export_as_file?token=mysecrettoken&project_id=2181147713":
                 Path(self.__get_test_file("sources/Project_2181147713.csv")).read_bytes(),
             "/https://d1x0mwiac2rqwt.cloudfront.net/g75-kL8pwVYNObSczLnVXe4FIyJd8YQL6b8yCilGyix09bMdJmxbtrGMW9jIeIwJ/by/16542905/as/bug.txt":
                 Path(self.__get_test_file("sources/bug.txt")).read_bytes(),

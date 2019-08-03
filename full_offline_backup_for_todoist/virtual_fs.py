@@ -6,7 +6,7 @@ import io
 import zipfile
 from pathlib import Path
 
-class VirtualFs(object, metaclass=ABCMeta):
+class VirtualFs(metaclass=ABCMeta):
     """ An abstract layer over the filesystem
         (e.g. can represent a real folder, a ZIP file, etc.) """
 

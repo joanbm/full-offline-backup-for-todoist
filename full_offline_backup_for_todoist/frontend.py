@@ -20,12 +20,13 @@ class ConsoleFrontend:
         token_group.add_argument("--token-file", type=str,
                                  help="file containing the todoist API token")
         parser.add_argument("--email", type=str,
-                            help="todoist email address for authorization")
+                            help="todoist email address for attachment download authorization")
         parser.add_argument("--password", type=str,
-                            help="todoist email address for authorization")
+                            help="todoist password for attachment download authorization")
 
     def __parse_command_line_args(self, prog, arguments):
-        example1_str = "Example: {} download --token 0123456789abcdef --email myemail@example.com --password P4ssW0rD".format(prog)
+        example1_str = ("Example: {} download --token 0123456789abcdef "
+                        "--email myemail@example.com --password P4ssW0rD").format(prog)
         parser = argparse.ArgumentParser(prog=prog, formatter_class=argparse.RawTextHelpFormatter,
                                          epilog=example1_str)
         parser.add_argument("--verbose", action="store_true", help="print details to console")

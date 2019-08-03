@@ -48,7 +48,7 @@ class TodoistBackupAttachmentsDownloader:
             matches = self.__TODOIST_ATTACHMENT_REGEXP.findall(row["CONTENT"])
             for matchstr in matches:
                 attachment_info = self.__fetch_attachment_info_from_json(matchstr)
-                if attachment_info != None:
+                if attachment_info is not None:
                     attachment_infos.append(attachment_info)
 
         return attachment_infos
