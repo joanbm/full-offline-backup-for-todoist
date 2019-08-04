@@ -1,6 +1,5 @@
 # Maintainer: Joan Bruguera Micó <joanbrugueram@gmail.com>
 pkgname=full-offline-backup-for-todoist-git
-_gitname="full-offline-backup-for-todoist"
 pkgver=0.1
 pkgrel=1
 pkgdesc="Small, dependency-less Python script to make a backup of all Todoist tasks and attachments that is accessible offline"
@@ -15,7 +14,12 @@ options=(!emptydirs)
 source=('git+https://github.com/joanbm/full-offline-backup-for-todoist.git')
 sha256sums=('SKIP')
 
+pkgver() {
+	cd "$srcdir/${pkgname%-git}"
+	printf "r%s.%s" "$(git rev-list --count HEAD)" "$(git rev-parse --short HEAD)"
+}
+
 package() {
-  cd "$srcdir/$_gitname"
-  python setup.py install --root="$pkgdir/" --optimize=1
+	cd "$srcdir/${pkgname%-git}"
+	python setup.py install --root="$pkgdir/" --optimize=1
 }
