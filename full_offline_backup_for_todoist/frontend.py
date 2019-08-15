@@ -26,10 +26,11 @@ class ConsoleFrontend:
         parser.add_argument("--password", type=str, help=argparse.SUPPRESS)
 
     def __parse_command_line_args(self, prog, arguments):
-        epilog_str = "Example: {} download".format(prog)
-        epilog_str += "The necessary credentials will be asked through the command line"
+        epilog_str = "Example: {} download\n".format(prog)
+        epilog_str += "(The necessary credentials will be asked through the command line. "
         epilog_str += "If you wish to automate the backup process, the TODOIST_TOKEN, "
-        epilog_str += "TODOIST_EMAIL and TODOIST_PASSWORD are also available"
+        epilog_str += "TODOIST_EMAIL and TODOIST_PASSWORD environment variables are available "
+        epilog_str += "for that purpose)"
         parser = argparse.ArgumentParser(prog=prog, formatter_class=argparse.RawTextHelpFormatter,
                                          epilog=epilog_str)
         parser.add_argument("--verbose", action="store_true", help="print details to console")
