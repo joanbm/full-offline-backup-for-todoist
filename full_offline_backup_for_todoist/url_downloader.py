@@ -77,6 +77,5 @@ class TodoistAuthURLDownloader(URLDownloader):
         if data is not None:
             real_url += "?" + urllib.parse.urlencode(data)
 
-        self.__tracer.trace("Downloading URL: {}".format(real_url))
         with self.__opener.open(real_url) as url_handle:
             return url_handle.read()

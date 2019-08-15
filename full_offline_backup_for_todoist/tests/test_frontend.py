@@ -18,7 +18,7 @@ class TestFrontend(unittest.TestCase):
         frontend = ConsoleFrontend(Mock(return_value=controller), Mock())
 
         # Act
-        frontend.run("util", ["download", "--token", "1234"])
+        frontend.run("util", ["download"], {"TODOIST_TOKEN": "1234"})
 
         # Assert
         controller.download.assert_called_with(ANY, with_attachments=False)
@@ -32,7 +32,10 @@ class TestFrontend(unittest.TestCase):
         frontend = ConsoleFrontend(Mock(return_value=controller), Mock())
 
         # Act
-        frontend.run("util", ["download", "--with-attachments", "--token", "1234"])
+        frontend.run("util", ["download", "--with-attachments"],
+                     {"TODOIST_TOKEN": "1234",
+                      "TODOIST_EMAIL": "asd@asd.asd",
+                      "TODOIST_PASSWORD": "1234"})
 
         # Assert
         controller.download.assert_called_with(ANY, with_attachments=True)

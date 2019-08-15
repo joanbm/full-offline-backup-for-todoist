@@ -14,11 +14,10 @@ class RuntimeControllerDependencyInjector(ControllerDependencyInjector):
     def __init__(self, auth, verbose):
         super(RuntimeControllerDependencyInjector, self).__init__(auth, verbose)
         self.__tracer = ConsoleTracer() if verbose else NullTracer()
-        if ("email" in auth and auth["email"] is not None and
-                "password" in auth and auth["password"] is not None):
+        if "email" in auth and "password" in auth:
+            self.__tracer.trace("NOTE: Using authentication workaround to download the attachments")
             urldownloader = TodoistAuthURLDownloader(self.__tracer, auth["email"], auth["password"])
         else:
-            self.__tracer.trace("NOTE: No email/password given, falling back to no-auth downloader")
             urldownloader = URLLibURLDownloader()
         todoist_api = TodoistApi(auth["token"], self.__tracer, urldownloader)
         self.__backup_downloader = TodoistBackupDownloader(self.__tracer, todoist_api)
