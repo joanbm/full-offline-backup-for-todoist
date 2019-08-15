@@ -18,7 +18,7 @@ class ConsoleFrontend:
         # Those options are deprecated, since they are easy to use incorrectly
         # (e.g. by getting the password logged to the history file,
         #       or using a world-accesible file).
-        # Using either interactive console output or environment variables is recommended
+        # Using either interactive console input or environment variables is recommended
         token_group = parser.add_mutually_exclusive_group()
         token_group.add_argument("--token", type=str, help=argparse.SUPPRESS)
         token_group.add_argument("--token-file", type=str, help=argparse.SUPPRESS)
