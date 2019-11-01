@@ -56,6 +56,10 @@ Print full help:
 
 The easiest way to get one is to open the **web version of Todoist**, go to the **Settings** section, then to the **Integrations** sections and you will see a API token there in the **"Token API"** section.
 
+## How can I automate the backup process?
+
+To automate the backup process, you can use any automation tool you want (e.g. cron, Jenkins) that can run the utility. In order to pass the credentials non-interactively, you can set the `TODOIST_TOKEN`, `TODOIST_EMAIL` and `TODOIST_PASSWORD` environment variables before running it from your automation tool.
+
 # Disclaimer
 
 This is **NOT** an official application. This application is not created by, affiliated with, or supported by Doist.
