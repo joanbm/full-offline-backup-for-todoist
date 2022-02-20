@@ -11,7 +11,6 @@ class ConsoleFrontend:
     def __init__(self, controller_factory, controller_dependencies_factory):
         self.__controller_factory = controller_factory
         self.__controller_dependencies_factory = controller_dependencies_factory
-        self.__controller = None
 
     @staticmethod
     def __add_authorization_group(parser):
@@ -60,7 +59,7 @@ class ConsoleFrontend:
                 print( "WARNING: Passing credentials through the command line is deprecated.")
                 print(f"         Pass it through the {env_var} environment variable,")
                 print( "         or remove the parameter and type it through the console")
-                return Path(opt_file).read_text() if opt_file else opt_direct
+                return Path(opt_file).read_text('utf-8') if opt_file else opt_direct
 
             if env_var in environment:
                 return environment[env_var]

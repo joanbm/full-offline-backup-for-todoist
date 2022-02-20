@@ -12,7 +12,7 @@ class RuntimeControllerDependencyInjector(ControllerDependencyInjector):
     """ Implementation of the dependency injection container for the actual runtime objects """
 
     def __init__(self, auth, verbose):
-        super(RuntimeControllerDependencyInjector, self).__init__(auth, verbose)
+        super().__init__(auth, verbose)
         self.__tracer = ConsoleTracer() if verbose else NullTracer()
         if "email" in auth and "password" in auth:
             self.__tracer.trace("NOTE: Using authentication workaround to download the attachments")
