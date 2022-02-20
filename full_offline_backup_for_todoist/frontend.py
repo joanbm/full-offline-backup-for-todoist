@@ -26,7 +26,7 @@ class ConsoleFrontend:
         parser.add_argument("--password", type=str, help=argparse.SUPPRESS)
 
     def __parse_command_line_args(self, prog, arguments):
-        epilog_str = "Example: {} download\n".format(prog)
+        epilog_str = f"Example: {prog} download\n"
         epilog_str += "(The necessary credentials will be asked through the command line. "
         epilog_str += "If you wish to automate the backup process, the TODOIST_TOKEN, "
         epilog_str += "TODOIST_EMAIL and TODOIST_PASSWORD environment variables are available "
@@ -57,9 +57,9 @@ class ConsoleFrontend:
     def __get_auth(args, environment):
         def get_credential(opt_file, opt_direct, env_var, prompt, sensitive):
             if opt_file or opt_direct:
-                print("WARNING: Passing credentials through the command line is deprecated.")
-                print("         Pass it through the {} environment variable,".format(env_var))
-                print("         or remove the parameter and type it through the console")
+                print( "WARNING: Passing credentials through the command line is deprecated.")
+                print(f"         Pass it through the {env_var} environment variable,")
+                print( "         or remove the parameter and type it through the console")
                 return Path(opt_file).read_text() if opt_file else opt_direct
 
             if env_var in environment:

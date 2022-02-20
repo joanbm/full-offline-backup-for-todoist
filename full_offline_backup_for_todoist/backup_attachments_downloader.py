@@ -63,7 +63,7 @@ class TodoistBackupAttachmentsDownloader:
         # We iterate over the sorted file name list, so the resulting list
         # is always in a consistent order independently of quirks in the VFS
         for name in sorted(vfs.file_list()):
-            self.__tracer.trace("Parsing CSV file '{}'...".format(name))
+            self.__tracer.trace(f"Parsing CSV file '{name}'...")
             csv_string = vfs.read_file(name).decode('utf-8-sig')
             attachment_infos.extend(self.__fetch_attachment_infos_from_csv(csv_string))
 
@@ -90,8 +90,8 @@ class TodoistBackupAttachmentsDownloader:
             if attachment_info.file_name in included_attachment_names:
                 new_file_name = self.__deduplicate_file_name(
                     attachment_info.file_name, included_attachment_names)
-                self.__tracer.trace("Duplicate attachment name found - Renaming {} to {}...".format(
-                    attachment_info.file_name, new_file_name))
+                self.__tracer.trace("Duplicate attachment name found - "
+                    f"Renaming {attachment_info.file_name} to {new_file_name}...")
                 attachment_info.file_name = new_file_name
 
             included_attachment_names.add(attachment_info.file_name)
@@ -100,15 +100,15 @@ class TodoistBackupAttachmentsDownloader:
         """ Downloads and packs the given attachments in a folder 'attachments'
             of the current Todoist backup VFS """
         for idx, attachment_info in enumerate(attachment_infos):
-            self.__tracer.trace("[{}/{}] Downloading attachment '{}'... ".format(
-                idx+1, len(attachment_infos), attachment_info.file_name))
+            self.__tracer.trace(f"[{idx+1}/{len(attachment_infos)}] "
+                f"Downloading attachment '{attachment_info.file_name}'...")
 
             data = self.__urldownloader.get(attachment_info.file_url)
 
             vfs.write_file(self.__ATTACHMENT_FOLDER + attachment_info.file_name, data)
 
-            self.__tracer.trace("[{}/{}] Downloaded attachment '{}'... ".format(
-                idx+1, len(attachment_infos), attachment_info.file_name))
+            self.__tracer.trace(f"[{idx+1}/{len(attachment_infos)}] "
+                f"Downloaded attachment '{attachment_info.file_name}'...")
 
     def download_attachments(self, vfs):
         """ Downloads all the attachments of the current Todoist backup VFS
@@ -121,6 +121,6 @@ class TodoistBackupAttachmentsDownloader:
 
         # Fetch the information of all the attachments
         attachment_infos = self.__fetch_attachment_infos(vfs)
-        self.__tracer.trace("Found {} attachments.".format(len(attachment_infos)))
+        self.__tracer.trace(f"Found {len(attachment_infos)} attachments.")
         self.__deduplicate_attachments_names(attachment_infos)
         self.__download_and_pack_attachments(attachment_infos, vfs)

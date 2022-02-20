@@ -28,6 +28,10 @@ class TestTodoistBackupAttachmentsDownloader(unittest.TestCase):
         }
         self.__fake_urldownloader = MagicMock(get=lambda url: self.__urlmap[url])
 
+    @staticmethod
+    def __make_note_row(content):
+        return ["note", f" [[file {json.dumps(content)}]]", "test"]
+
     def test_on_simple_download_downloads_attachments(self):
         """ Does a basic test with valid data to ensure attachments are downloaded """
         # Arrange
@@ -35,11 +39,11 @@ class TestTodoistBackupAttachmentsDownloader(unittest.TestCase):
         writer = csv.writer(output, quoting=csv.QUOTE_NONNUMERIC)
         writer.writerow(["TYPE", "CONTENT", "PRIORITY"])
         writer.writerow(["task", "This is a random task", "4"])
-        writer.writerow(["note", " [[file {}]]".format(json.dumps({
+        writer.writerow(self.__make_note_row({
             "file_type": "image/jpg",
             "file_name": "this_is_an_image.jpg",
             "file_url": self._TEST_FILE_JPG_URL
-        })), "test"])
+        }))
 
         vfs = InMemoryVfs()
         vfs.write_file(self._TEST_CSV_FILE_NAME, output.getvalue().encode())
@@ -63,11 +67,11 @@ class TestTodoistBackupAttachmentsDownloader(unittest.TestCase):
         writer = csv.writer(output, quoting=csv.QUOTE_NONNUMERIC)
         writer.writerow(["TYPE", "CONTENT", "PRIORITY"])
         writer.writerow(["task", "How to shoot on iPhone 7", "4"])
-        writer.writerow(["note", " [[file {}]]".format(json.dumps({
+        writer.writerow(self.__make_note_row({
             "site_name": "Apple",
             "title": "How to shoot on iPhone - Photography",
             "url": "https://www.apple.com/iphone/photography-how-to/"
-        })), "test"])
+        }))
 
         vfs = InMemoryVfs()
         vfs.write_file(self._TEST_CSV_FILE_NAME, output.getvalue().encode())
@@ -89,18 +93,18 @@ class TestTodoistBackupAttachmentsDownloader(unittest.TestCase):
         writer = csv.writer(output, quoting=csv.QUOTE_NONNUMERIC)
         writer.writerow(["TYPE", "CONTENT", "PRIORITY"])
         writer.writerow(["task", "This is a random task", "4"])
-        writer.writerow(["note", " [[file {}]]".format(json.dumps({
+        writer.writerow(self.__make_note_row({
             "file_type": "image/jpg",
             "file_name": "image.jpg",
             "file_url": self._TEST_FILE_JPG_URL
-        })), "test"])
+        }))
 
         writer.writerow(["task", "This is another random task", "4"])
-        writer.writerow(["note", " [[file {}]]".format(json.dumps({
+        writer.writerow(self.__make_note_row({
             "file_type": "image/jpg",
             "file_name": "file.ini",
             "file_url": self._TEST_ATTACHMENT_INI_URL
-        })), "test"])
+        }))
         writer.writerow(["", "", ""])
 
         vfs = InMemoryVfs()
@@ -127,11 +131,11 @@ class TestTodoistBackupAttachmentsDownloader(unittest.TestCase):
         writer = csv.writer(output, quoting=csv.QUOTE_NONNUMERIC)
         writer.writerow(["TYPE", "CONTENT", "PRIORITY"])
         writer.writerow(["task", "This is a random task", "4"])
-        writer.writerow(["note", " [[file {}]]".format(json.dumps({
+        writer.writerow(self.__make_note_row({
             "file_type": "image/jpg",
             "file_name": "image.jpg",
             "file_url": self._TEST_FILE_JPG_URL
-        })), "test"])
+        }))
 
         vfs = InMemoryVfs()
         vfs.write_file(self._TEST_CSV_FILE_NAME, output.getvalue().encode())
@@ -156,18 +160,18 @@ class TestTodoistBackupAttachmentsDownloader(unittest.TestCase):
         writer = csv.writer(output, quoting=csv.QUOTE_NONNUMERIC)
         writer.writerow(["TYPE", "CONTENT", "PRIORITY"])
         writer.writerow(["task", "This is a random task", "4"])
-        writer.writerow(["note", " [[file {}]]".format(json.dumps({
+        writer.writerow(self.__make_note_row({
             "file_type": "image/jpg",
             "file_name": "image.jpg",
             "file_url": self._TEST_FILE_JPG_URL
-        })), "test"])
+        }))
 
         writer.writerow(["task", "This is another random task", "4"])
-        writer.writerow(["note", " [[file {}]]".format(json.dumps({
+        writer.writerow(self.__make_note_row({
             "file_type": "image/jpg",
             "file_name": "image.jpg",
             "file_url": self._TEST_ATTACHMENT_INI_URL
-        })), "test"])
+        }))
         writer.writerow(["", "", ""])
 
         vfs = InMemoryVfs()

@@ -29,7 +29,6 @@ class TodoistBackupDownloader:
         projects = self.__todoist_api.get_projects()
 
         for project in projects:
-            export_csv_file_name = "{} [{}].csv".format(
-                sanitize_file_name(project.name), project.identifier)
+            export_csv_file_name = f"{sanitize_file_name(project.name)} [{project.identifier}].csv"
             export_csv_file_content = self.__todoist_api.export_project_as_csv(project)
             vfs.write_file(export_csv_file_name, export_csv_file_content)
