@@ -24,25 +24,25 @@ This tool aims to allow you to make a complete backup, including all attachments
 
 * Can download all attachments of the tasks associated to your Todoist backup.
 
-* Unlike Todoist's automatic backup ZIPs, valid ZIPs are generated  when you have projects that contain non-ASCII characters (i.e. Unicode characters like 💓) so they can be correctly handled by ZIP tools.
-
 * Can be easily automated to download your backups periodically.
 
 ## Status
 
-Early version - enough for basic use, but not tested under every possible scenario under the sun.
+Stable, but not tested under every possible scenario under the sun.
 
 ## Requirements
 
-* Python 3 (tested with Python 3.6.4, but it should work with many more versions). No additional dependencies needed.
+* Python 3 (tested with Python 3.6.4+). No additional dependencies needed.
 
 ## Usage examples
 
-Create a backup from Todoist's servers, without including attachments (you will be asked for your Todoist API Token through the command line):
+Download the repository and open a terminal at the root folder.
+
+To create a backup from Todoist's servers, without including attachments (you will be asked for your Todoist API Token through the command line):
 
 ``python3 -m full_offline_backup_for_todoist download``
 
-Create a backup from Todoist's servers, including attachments, and with tracing/progress info:
+To create a backup from Todoist's servers, including attachments, and with tracing/progress info:
 
 ``python3 -m full_offline_backup_for_todoist --verbose download --with-attachments``
 
