@@ -2,6 +2,7 @@
 """ Implementation of the console frontend of the Todoist backup utility """
 
 import argparse
+import os
 import getpass
 from pathlib import Path
 from .virtual_fs import ZipVirtualFs
@@ -14,14 +15,17 @@ class ConsoleFrontend:
 
     @staticmethod
     def __add_authorization_group(parser):
-        # Those options are deprecated, since they are easy to use incorrectly
-        # (e.g. by getting the password logged to the history file,
-        #       or using a world-accesible file).
-        # Using either interactive console input or environment variables is recommended
         token_group = parser.add_mutually_exclusive_group()
+        token_group.add_argument("--token-file", type=str,
+                                 help="path to a file containing the Todoist token")
+        parser.add_argument("--email", type=str, help="Todoist email")
+        parser.add_argument("--password-file", type=str,
+                            help="path to a file containing the Todoist password")
+
+        # Those options are deprecated, since they are easy to use incorrectly
+        # (e.g. by getting the password logged to the history file)
+        # Using either interactive console input, environment variables or files is recommended
         token_group.add_argument("--token", type=str, help=argparse.SUPPRESS)
-        token_group.add_argument("--token-file", type=str, help=argparse.SUPPRESS)
-        parser.add_argument("--email", type=str, help=argparse.SUPPRESS)
         parser.add_argument("--password", type=str, help=argparse.SUPPRESS)
 
     def __parse_command_line_args(self, prog, arguments):
@@ -53,26 +57,45 @@ class ConsoleFrontend:
         args.func(args, environment)
 
     @staticmethod
+    def __huge_warning(text):
+        print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+        print(text)
+        print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+        while input("Type 'CONTINUE ANYWAY' to continue: ") != 'CONTINUE ANYWAY':
+            pass
+
+    @staticmethod
     def __get_auth(args, environment):
         def get_credential(opt_file, opt_direct, env_var, prompt, sensitive):
-            if opt_file or opt_direct:
-                print( "WARNING: Passing credentials through the command line is deprecated.")
-                print(f"         Pass it through the {env_var} environment variable,")
-                print( "         or remove the parameter and type it through the console")
-                return Path(opt_file).read_text('utf-8') if opt_file else opt_direct
+            if opt_file:
+                if sensitive and os.name == "posix": # OpenSSH-like check
+                    file_stat = os.stat(opt_file)
+                    if file_stat.st_uid == os.getuid() and file_stat.st_mode & 0o077 != 0:
+                        ConsoleFrontend.__huge_warning(
+                            f"WARNING: Reading credentials from file {opt_file} "
+                            "accessible by other users is deprecated.")
+                return Path(opt_file).read_text('utf-8')
+
+            if sensitive and opt_direct:
+                ConsoleFrontend.__huge_warning(
+                     "WARNING: Passing credentials through the command line is deprecated.\n"
+                    f"         Pass it through the {env_var} environment variable,\n"
+                     "         or remove the parameter and type it through the console")
+                return opt_direct
 
             if env_var in environment:
                 return environment[env_var]
             return getpass.getpass(prompt + ": ") if sensitive else input(prompt + ": ")
 
         auth = {}
-        auth["token"] = get_credential(args.token_file, args.token,
-                                       "TODOIST_TOKEN", "Todoist token", True)
+        auth["token"] = get_credential(args.token_file, args.token, "TODOIST_TOKEN",
+                                       "Todoist token (from Settings -> Integrations)",
+                                       sensitive=True)
         if args.with_attachments:
-            auth["email"] = get_credential(None, args.email,
-                                           "TODOIST_EMAIL", "Todoist email", False)
-            auth["password"] = get_credential(None, args.password,
-                                              "TODOIST_PASSWORD", "Todoist password", True)
+            auth["email"] = get_credential(None, args.email, "TODOIST_EMAIL",
+                                           "Todoist email", sensitive=False)
+            auth["password"] = get_credential(None, args.password, "TODOIST_PASSWORD",
+                                              "Todoist password", sensitive=True)
         return auth
 
     def handle_download(self, args, environment):
