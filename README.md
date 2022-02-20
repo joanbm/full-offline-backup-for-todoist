@@ -1,6 +1,6 @@
 # full-offline-backup-for-todoist
 
-[![Build Status](https://travis-ci.org/joanbm/full-offline-backup-for-todoist.svg?branch=master)](https://travis-ci.org/joanbm/full-offline-backup-for-todoist)
+![Build Status](https://github.com/joanbm/full-offline-backup-for-todoist/actions/workflows/run-tests.yml/badge.svg?branch=master)
 
 [![Coverage Status](https://coveralls.io/repos/github/joanbm/full-offline-backup-for-todoist/badge.svg)](https://coveralls.io/github/joanbm/full-offline-backup-for-todoist)
 
