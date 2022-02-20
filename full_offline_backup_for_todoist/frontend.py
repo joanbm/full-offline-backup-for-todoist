@@ -30,10 +30,9 @@ class ConsoleFrontend:
 
     def __parse_command_line_args(self, prog, arguments):
         epilog_str = f"Example: {prog} download\n"
-        epilog_str += "(The necessary credentials will be asked through the command line. "
-        epilog_str += "If you wish to automate the backup process, the TODOIST_TOKEN, "
-        epilog_str += "TODOIST_EMAIL and TODOIST_PASSWORD environment variables are available "
-        epilog_str += "for that purpose)"
+        epilog_str += "(The necessary credentials will be asked through the command line.\n"
+        epilog_str += " If you wish to automate backups, credentials can be passed through the\n"
+        epilog_str += " TODOIST_TOKEN, TODOIST_EMAIL and TODOIST_PASSWORD environment variables)"
         parser = argparse.ArgumentParser(prog=prog, formatter_class=argparse.RawTextHelpFormatter,
                                          epilog=epilog_str)
         parser.add_argument("--verbose", action="store_true", help="print details to console")
