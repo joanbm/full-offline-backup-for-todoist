@@ -23,8 +23,8 @@ class TestIntegration(unittest.TestCase):
         self.__test_dir = tempfile.mkdtemp()
         os.chdir(self.__test_dir)
 
-        # Store a reference to the original urlopen function, since we are going to replace it
-        self.__original_urlopen = urllib.request.urlopen
+        # Store a reference to the original OpenerDirector.open function, since we are going to replace it
+        self.__original_opener_open = urllib.request.OpenerDirector.open
 
         # Set up the fake HTTP server with local responses
         # pylint: disable=line-too-long
@@ -57,12 +57,12 @@ class TestIntegration(unittest.TestCase):
         """ Destroys the sample HTTP server for the test """
         self.__httpd.shutdown()
 
-    def __urlopen_redirect_to_local(self, url):
-        """ Replaces the urlopen function of URLLib, in order to redirect all requests
+    def __opener_open_redirect_to_local(self, original_self, url):
+        """ Replaces the OpenerDirector.open function of URLLib, in order to redirect all requests
             to a local server.
             This way, we are still able to do the integration test with actual HTTP requests,
             though being handled by a local test HTTP server """
-        return self.__original_urlopen("http://127.0.0.1:33327/" + url)
+        return self.__original_opener_open(original_self, "http://127.0.0.1:33327/" + url)
 
     @staticmethod
     def __get_test_file(subpath):
@@ -89,13 +89,13 @@ class TestIntegration(unittest.TestCase):
     @patch.object(os, 'environ', {"TODOIST_TOKEN": "mysecrettoken",
                                   "TODOIST_EMAIL": "asd@asd.asd",
                                   "TODOIST_PASSWORD": "mysecretpassword"})
-    @patch.object(urllib.request, 'urlopen')
+    @patch.object(urllib.request.OpenerDirector, 'open', autospec=True)
     @unittest.skip("Not yet adapted to mock the attachment download workaround")
-    def test_integration_download_with_attachments(self, mock_urlopen):
+    def test_integration_download_with_attachments(self, mock_opener_open):
         """ Integration test for downloading the backup with attachments """
 
         # Arrange
-        mock_urlopen.side_effect = self.__urlopen_redirect_to_local
+        mock_opener_open.side_effect = self.__opener_open_redirect_to_local
 
         # Act
         main()
@@ -107,12 +107,12 @@ class TestIntegration(unittest.TestCase):
 
     @patch.object(sys, 'argv', ["program", "download"])
     @patch.object(os, 'environ', {"TODOIST_TOKEN": "mysecrettoken"})
-    @patch.object(urllib.request, 'urlopen')
-    def test_integration_download_without_attachments(self, mock_urlopen):
+    @patch.object(urllib.request.OpenerDirector, 'open', autospec=True)
+    def test_integration_download_without_attachments(self, mock_opener_open):
         """ Integration test for downloading the backup without attachments """
 
         # Arrange
-        mock_urlopen.side_effect = self.__urlopen_redirect_to_local
+        mock_opener_open.side_effect = self.__opener_open_redirect_to_local
 
         # Act
         main()

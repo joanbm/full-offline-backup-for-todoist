@@ -13,6 +13,12 @@ class URLDownloader(metaclass=ABCMeta):
         """ Download the contents of the specified URL with a GET request.
             You can specify any additional data parameters to pass to the destination. """
 
+    @staticmethod
+    def _build_opener_with_app_useragent(*args, **kwargs):
+        opener = urllib.request.build_opener(*args, **kwargs)
+        opener.addheaders = [('User-agent', 'full-offline-backup-for-todoist')]
+        return opener
+
 class URLLibURLDownloader(URLDownloader):
     """ Implementation of a class to download the contents of an URL through URLLib """
 
@@ -21,7 +27,8 @@ class URLLibURLDownloader(URLDownloader):
         if data is not None:
             real_url += "?" + urllib.parse.urlencode(data)
 
-        with urllib.request.urlopen(real_url) as url_handle:
+        opener = self._build_opener_with_app_useragent()
+        with opener.open(real_url) as url_handle:
             return url_handle.read()
 
 class TodoistAuthURLDownloader(URLDownloader):
@@ -46,7 +53,7 @@ class TodoistAuthURLDownloader(URLDownloader):
             # Set up a cookie jar, to gather the login's cookies
             cookiejar = http.cookiejar.CookieJar()
             cookie_process = urllib.request.HTTPCookieProcessor(cookiejar)
-            self.__opener = urllib.request.build_opener(cookie_process)
+            self.__opener = self._build_opener_with_app_useragent(cookie_process)
 
             self.__tracer.trace("Auth Step 1: Get CSRF token")
 
