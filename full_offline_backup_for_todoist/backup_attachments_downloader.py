@@ -8,7 +8,7 @@ import json
 import itertools
 import os
 import urllib.error
-from typing import Optional
+from typing import Set, List, Optional
 from .utils import sanitize_file_name
 from .virtual_fs import VirtualFs
 from .tracer import Tracer
@@ -49,7 +49,7 @@ class TodoistBackupAttachmentsDownloader:
         return TodoistAttachmentInfo(sanitize_file_name(json_data["file_name"]),
                                      json_data["file_url"])
 
-    def __fetch_attachment_infos_from_csv(self, csv_string: str) -> list[TodoistAttachmentInfo]:
+    def __fetch_attachment_infos_from_csv(self, csv_string: str) -> List[TodoistAttachmentInfo]:
         """ Fetches the information of all the attachments of a Todoist backup CSV file,
             given a CSV file as a single string """
         attachment_infos = []
@@ -64,7 +64,7 @@ class TodoistBackupAttachmentsDownloader:
 
         return attachment_infos
 
-    def __fetch_attachment_infos(self, vfs: VirtualFs) -> list[TodoistAttachmentInfo]:
+    def __fetch_attachment_infos(self, vfs: VirtualFs) -> List[TodoistAttachmentInfo]:
         """ Fetches the information of all the attachment_infos
             of the current Todoist backup VFS """
         self.__tracer.trace("Reading VFS...")
@@ -81,7 +81,7 @@ class TodoistBackupAttachmentsDownloader:
         return attachment_infos
 
     @staticmethod
-    def __deduplicate_file_name(original_file_name: str, file_names_to_avoid: set[str]) -> str:
+    def __deduplicate_file_name(original_file_name: str, file_names_to_avoid: Set[str]) -> str:
         """ Modifies the given file name in order to avoid all of the file names
            in the given list of file names to avoid """
         name_without_ext, ext = os.path.splitext(original_file_name)
@@ -93,10 +93,10 @@ class TodoistBackupAttachmentsDownloader:
         raise Exception('Unreachable code') # pragma: no cover
 
     def __deduplicate_attachments_names(self,
-                                        attachment_infos: list[TodoistAttachmentInfo]) -> None:
+                                        attachment_infos: List[TodoistAttachmentInfo]) -> None:
         """ Modifies the attachment names, if necessary, in order to
             avoid duplicate file names """
-        included_attachment_names: set[str] = set()
+        included_attachment_names: Set[str] = set()
 
         for attachment_info in attachment_infos:
             if attachment_info.file_name in included_attachment_names:
@@ -108,7 +108,7 @@ class TodoistBackupAttachmentsDownloader:
 
             included_attachment_names.add(attachment_info.file_name)
 
-    def __download_and_pack_attachments(self, attachment_infos: list[TodoistAttachmentInfo],
+    def __download_and_pack_attachments(self, attachment_infos: List[TodoistAttachmentInfo],
                                               vfs: VirtualFs, ignore_forbidden: bool) -> None:
         """ Downloads and packs the given attachments in a folder 'attachments'
             of the current Todoist backup VFS """

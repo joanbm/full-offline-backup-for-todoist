@@ -4,14 +4,14 @@ from abc import ABCMeta, abstractmethod
 import urllib.request
 import urllib.parse
 import http.cookiejar
-from typing import cast, Optional
+from typing import cast, Dict, Optional
 from .tracer import Tracer
 
 class URLDownloader(metaclass=ABCMeta):
     """ Implementation of a class to download the contents of an URL """
 
     @abstractmethod
-    def get(self, url: str, data: Optional[dict[str, str]]=None) -> bytes:
+    def get(self, url: str, data: Optional[Dict[str, str]]=None) -> bytes:
         """ Download the contents of the specified URL with a GET request.
             You can specify any additional data parameters to pass to the destination. """
 
@@ -25,7 +25,7 @@ class URLDownloader(metaclass=ABCMeta):
 class URLLibURLDownloader(URLDownloader):
     """ Implementation of a class to download the contents of an URL through URLLib """
 
-    def get(self, url: str, data: Optional[dict[str, str]]=None) -> bytes:
+    def get(self, url: str, data: Optional[Dict[str, str]]=None) -> bytes:
         real_url = url
         if data:
             real_url += "?" + urllib.parse.urlencode(data)
@@ -56,7 +56,7 @@ class TodoistAuthURLDownloader(URLDownloader):
         self.__password = password
         self.__opener = None
 
-    def get(self, url: str, data: Optional[dict[str, str]]=None) -> bytes:
+    def get(self, url: str, data: Optional[Dict[str, str]]=None) -> bytes:
         if not self.__opener:
             # Set up a cookie jar, to gather the login's cookies
             cookiejar = http.cookiejar.CookieJar()

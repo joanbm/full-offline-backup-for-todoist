@@ -2,6 +2,7 @@
 """ Provides access to a subset of the features of the Todoist API"""
 
 import json
+from typing import List
 from .tracer import Tracer
 from .url_downloader import URLDownloader
 
@@ -31,7 +32,7 @@ class TodoistApi:
         self.__tracer = tracer
         self.__urldownloader = urldownloader
 
-    def get_projects(self) -> list[TodoistProjectInfo]:
+    def get_projects(self) -> List[TodoistProjectInfo]:
         """ Obtains the list of all projects from the Todoist API """
         self.__tracer.trace("Fetching projects using the Todoist API...")
         project_list_json = self.__urldownloader.get(

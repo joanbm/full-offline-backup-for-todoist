@@ -6,7 +6,7 @@ import io
 import zipfile
 from pathlib import Path
 from types import TracebackType
-from typing import IO, Optional, Type
+from typing import IO, List, Optional, Type
 
 class VirtualFs(metaclass=ABCMeta):
     """ An abstract layer over the filesystem
@@ -21,7 +21,7 @@ class VirtualFs(metaclass=ABCMeta):
         """ Checks if the filesystem previously existed, or is newly created """
 
     @abstractmethod
-    def file_list(self) -> list[str]:
+    def file_list(self) -> List[str]:
         """ Gets the list of files in this virtual file system """
 
     @abstractmethod
@@ -57,8 +57,8 @@ class ZipVirtualFs(VirtualFs):
 
         return self
 
-    def __exit__(self, exc_type: Type[BaseException] | None, exc_value: BaseException | None,
-                 traceback: TracebackType | None) -> None:
+    def __exit__(self, exc_type: Optional[Type[BaseException]], exc_value: Optional[BaseException],
+                 traceback: Optional[TracebackType]) -> None:
         if self._zip_file:
             self._zip_file.close()
             self._zip_file = None
@@ -77,7 +77,7 @@ class ZipVirtualFs(VirtualFs):
         assert self._backing_storage
         return not isinstance(self._backing_storage, io.BytesIO)
 
-    def file_list(self) -> list[str]:
+    def file_list(self) -> List[str]:
         assert self._zip_file
         return self._zip_file.namelist()
 

@@ -2,7 +2,7 @@
 """ Provides frontend-independent access to the functions of the interface """
 
 from abc import ABCMeta, abstractmethod
-from typing import Literal, NamedTuple, Optional, Union
+from typing import NamedTuple, Optional, Union
 from .tracer import Tracer
 from .virtual_fs import VirtualFs
 from .backup_downloader import TodoistBackupDownloader
@@ -43,8 +43,8 @@ class Controller:
     def __init__(self, dependencies: ControllerDependencyInjector):
         self.__dependencies = dependencies
 
-    def download(self, vfs: VirtualFs,
-                       with_attachments: Union[bool, Literal['ignore-forbidden']]) -> None:
+    def download(self, vfs: VirtualFs, with_attachments: Union[bool, str]) -> None:
+        # On Python 3.8+ "Literal['ignore-forbidden']" instead of ^^^str^^^ above
         """ Generates a Todoist backup ZIP from the current Todoist items """
         self.__dependencies.backup_downloader.download(vfs)
         if with_attachments:
