@@ -118,17 +118,17 @@ class TodoistBackupAttachmentsDownloader:
 
             try:
                 data = self.__urldownloader.get(attachment_info.file_url)
+
+                vfs.write_file(self.__ATTACHMENT_FOLDER + attachment_info.file_name, data)
+
+                self.__tracer.trace(f"[{idx+1}/{len(attachment_infos)}] "
+                    f"Downloaded attachment '{attachment_info.file_name}'...")
             except urllib.error.HTTPError as ex:
                 if ex.code == 403 and ignore_forbidden:
                     print(f"WARNING: Download of {attachment_info.file_name} failed due to " +
                            "HTTP 403 Forbidden error, ignoring...")
                 else:
                     raise
-
-            vfs.write_file(self.__ATTACHMENT_FOLDER + attachment_info.file_name, data)
-
-            self.__tracer.trace(f"[{idx+1}/{len(attachment_infos)}] "
-                f"Downloaded attachment '{attachment_info.file_name}'...")
 
     def download_attachments(self, vfs: VirtualFs, ignore_forbidden: bool=False) -> None:
         """ Downloads all the attachments of the current Todoist backup VFS
