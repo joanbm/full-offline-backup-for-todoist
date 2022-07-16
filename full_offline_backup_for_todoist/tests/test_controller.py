@@ -45,7 +45,7 @@ class TestController(unittest.TestCase):
         controllerinst.download(".", with_attachments=True)
 
         # Assert
-        downloader_attachments_mock.download_attachments.assert_called_with(ANY)
+        downloader_attachments_mock.download_attachments.assert_called_with(ANY, False)
 
     @staticmethod
     def test_on_latest_version_calls_download_for_that_version():
@@ -77,4 +77,4 @@ class TestController(unittest.TestCase):
         controllerinst.download(".", with_attachments=True)
 
         # Assert
-        downloader_attachments_mock.download_attachments.assert_called_with(ANY)
+        downloader_attachments_mock.download_attachments.assert_called_with(ANY, False)

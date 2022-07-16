@@ -23,7 +23,7 @@ class TestIntegration(unittest.TestCase):
         self.__test_dir = tempfile.mkdtemp()
         os.chdir(self.__test_dir)
 
-        # Store a reference to the original OpenerDirector.open function, since we are going to replace it
+        # Store a reference to the original OpenerDirector.open function, since we will replace it
         self.__original_opener_open = urllib.request.OpenerDirector.open
 
         # Set up the fake HTTP server with local responses
