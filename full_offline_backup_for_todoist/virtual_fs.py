@@ -52,10 +52,10 @@ class ZipVirtualFs(VirtualFs):
 
         return self
 
-    def __exit__(self, mytype, value, traceback):
+    def __exit__(self, exception_type, exception_value, exception_traceback):
         self._zip_file.close()
 
-        if isinstance(self._backing_storage, io.BytesIO) and self.dst_path is not None:
+        if not exception_value and isinstance(self._backing_storage, io.BytesIO) and self.dst_path:
             Path(self.dst_path).write_bytes(self._backing_storage.getvalue())
         self._backing_storage.close()
 
