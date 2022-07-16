@@ -2,16 +2,22 @@
 """ Class to download Todoist backup ZIPs using the Todoist API """
 import datetime
 from .utils import sanitize_file_name
+from .tracer import Tracer
+from .todoist_api import TodoistApi
+from .virtual_fs import VirtualFs
 
 class TodoistBackupDownloader:
     """ Class to download Todoist backup ZIPs using the Todoist API """
     __ZIP_FLAG_BITS_UTF8 = 0x800
 
-    def __init__(self, tracer, todoist_api):
+    __tracer: Tracer
+    __todoist_api: TodoistApi
+
+    def __init__(self, tracer: Tracer, todoist_api: TodoistApi):
         self.__tracer = tracer
         self.__todoist_api = todoist_api
 
-    def download(self, vfs):
+    def download(self, vfs: VirtualFs) -> None:
         """ Generates a Todoist backup and saves it to the given VFS """
         self.__tracer.trace("Generating backup from current Todoist status")
 

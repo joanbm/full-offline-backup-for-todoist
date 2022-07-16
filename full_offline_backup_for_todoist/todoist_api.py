@@ -2,11 +2,16 @@
 """ Provides access to a subset of the features of the Todoist API"""
 
 import json
+from .tracer import Tracer
+from .url_downloader import URLDownloader
 
 class TodoistProjectInfo:
     """ Represents the properties of a Todoist project """
 
-    def __init__(self, name, identifier):
+    name: str
+    identifier: str
+
+    def __init__(self, name: str, identifier: str):
         self.name = name
         self.identifier = identifier
 
@@ -17,12 +22,16 @@ class TodoistApi:
     __SYNC_ENDPOINT = __BASE_URL + "/sync"
     __EXPORT_PROJECT_AS_CSV_FILE_ENDPOINT = __BASE_URL + "/templates/export_as_file"
 
-    def __init__(self, api_token, tracer, urldownloader):
+    __api_token: str
+    __tracer: Tracer
+    __urldownloader: URLDownloader
+
+    def __init__(self, api_token: str, tracer: Tracer, urldownloader: URLDownloader):
         self.__api_token = api_token
         self.__tracer = tracer
         self.__urldownloader = urldownloader
 
-    def get_projects(self):
+    def get_projects(self) -> list[TodoistProjectInfo]:
         """ Obtains the list of all projects from the Todoist API """
         self.__tracer.trace("Fetching projects using the Todoist API...")
         project_list_json = self.__urldownloader.get(
@@ -38,7 +47,7 @@ class TodoistApi:
         self.__tracer.trace("Parsing Todoist API projects JSON...")
         return [TodoistProjectInfo(row["name"], row["id"]) for row in project_list["projects"]]
 
-    def export_project_as_csv(self, project):
+    def export_project_as_csv(self, project: TodoistProjectInfo) -> bytes:
         """ Obtains the latest version of the specified project as a CSV file """
         self.__tracer.trace(f"Fetching project '{project.name}' (ID {project.identifier})"
             " as CSV using the Todoist API...")

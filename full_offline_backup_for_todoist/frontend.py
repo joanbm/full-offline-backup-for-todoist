@@ -5,16 +5,20 @@ import argparse
 import os
 import getpass
 from pathlib import Path
+from typing import Callable, Optional
 from .virtual_fs import ZipVirtualFs
+from .controller import TodoistAuth, Controller, ControllerDependencyInjector
 
 class ConsoleFrontend:
     """ Implementation of the console frontend for the Todoist backup tool """
-    def __init__(self, controller_factory, controller_dependencies_factory):
+    def __init__(self, controller_factory: Callable[[ControllerDependencyInjector], Controller],
+                 controller_dependencies_factory: Callable[[TodoistAuth, bool],
+                                                           ControllerDependencyInjector]):
         self.__controller_factory = controller_factory
         self.__controller_dependencies_factory = controller_dependencies_factory
 
     @staticmethod
-    def __add_authorization_group(parser):
+    def __add_authorization_group(parser: argparse.ArgumentParser) -> None:
         token_group = parser.add_mutually_exclusive_group()
         token_group.add_argument("--token-file", type=str,
                                  help="path to a file containing the Todoist token")
@@ -28,7 +32,7 @@ class ConsoleFrontend:
         token_group.add_argument("--token", type=str, help=argparse.SUPPRESS)
         parser.add_argument("--password", type=str, help=argparse.SUPPRESS)
 
-    def __parse_command_line_args(self, prog, arguments):
+    def __parse_command_line_args(self, prog: str, arguments: list[str]) -> argparse.Namespace:
         epilog_str = f"Example: {prog} download\n"
         epilog_str += "(The necessary credentials will be asked through the command line.\n"
         epilog_str += " If you wish to automate backups, credentials can be passed through the\n"
@@ -53,13 +57,13 @@ class ConsoleFrontend:
 
         return parser.parse_args(arguments)
 
-    def run(self, prog, arguments, environment):
+    def run(self, prog: str, arguments: list[str], environment: os._Environ[str]) -> None:
         """ Runs the Todoist backup tool frontend with the specified command line arguments """
         args = self.__parse_command_line_args(prog, arguments)
         args.func(args, environment)
 
     @staticmethod
-    def __huge_warning(text):
+    def __huge_warning(text: str) -> None:
         print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
         print(text)
         print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
@@ -67,8 +71,9 @@ class ConsoleFrontend:
             pass
 
     @staticmethod
-    def __get_auth(args, environment):
-        def get_credential(opt_file, opt_direct, env_var, prompt, sensitive):
+    def __get_auth(args: argparse.Namespace, environment: os._Environ[str]) -> TodoistAuth:
+        def get_credential(opt_file: Optional[str], opt_direct: Optional[str],
+                           env_var: str, prompt: str, sensitive: bool) -> str:
             if opt_file:
                 if sensitive and os.name == "posix": # OpenSSH-like check
                     file_stat = os.stat(opt_file)
@@ -89,18 +94,15 @@ class ConsoleFrontend:
                 return environment[env_var]
             return getpass.getpass(prompt + ": ") if sensitive else input(prompt + ": ")
 
-        auth = {}
-        auth["token"] = get_credential(args.token_file, args.token, "TODOIST_TOKEN",
-                                       "Todoist token (from Settings -> Integrations)",
-                                       sensitive=True)
-        if args.with_attachments:
-            auth["email"] = get_credential(None, args.email, "TODOIST_EMAIL",
-                                           "Todoist email", sensitive=False)
-            auth["password"] = get_credential(None, args.password, "TODOIST_PASSWORD",
-                                              "Todoist password", sensitive=True)
-        return auth
+        token = get_credential(args.token_file, args.token, "TODOIST_TOKEN",
+                               "Todoist token (from Settings -> Integrations)", sensitive=True)
+        email = get_credential(None, args.email, "TODOIST_EMAIL", "Todoist email",
+                               sensitive=False) if args.with_attachments else None
+        password = get_credential(None, args.password, "TODOIST_PASSWORD", "Todoist password",
+                                  sensitive=True) if args.with_attachments else None
+        return TodoistAuth(token, email, password)
 
-    def handle_download(self, args, environment):
+    def handle_download(self, args: argparse.Namespace, environment: os._Environ[str]) -> None:
         """ Handles the download subparser with the specified command line arguments """
 
         # Configure controller

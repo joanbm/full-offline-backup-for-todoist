@@ -2,6 +2,7 @@
 """ Tests for the runtime dependency injection container """
 # pylint: disable=invalid-name
 import unittest
+from ..controller import TodoistAuth
 from ..runtime import RuntimeControllerDependencyInjector
 
 class TestRuntime(unittest.TestCase):
@@ -13,7 +14,7 @@ class TestRuntime(unittest.TestCase):
         # Arrange
 
         # Act
-        runtimedi = RuntimeControllerDependencyInjector({"token":"1234"}, False)
+        runtimedi = RuntimeControllerDependencyInjector(TodoistAuth("1234", None, None), False)
         tracer1 = runtimedi.tracer
         tracer2 = runtimedi.tracer
         backup_downloader1 = runtimedi.backup_downloader

@@ -7,7 +7,7 @@ from .frontend import ConsoleFrontend
 from .controller import Controller
 from .runtime import RuntimeControllerDependencyInjector
 
-def main():
+def main() -> None:
     """ Defines the main function of the Todoist backup utility """
     ConsoleFrontend(Controller, RuntimeControllerDependencyInjector).run(
         sys.argv[0], sys.argv[1:], os.environ)

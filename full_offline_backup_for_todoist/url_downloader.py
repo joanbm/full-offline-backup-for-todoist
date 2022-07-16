@@ -4,32 +4,35 @@ from abc import ABCMeta, abstractmethod
 import urllib.request
 import urllib.parse
 import http.cookiejar
+from typing import cast, Optional
+from .tracer import Tracer
 
 class URLDownloader(metaclass=ABCMeta):
     """ Implementation of a class to download the contents of an URL """
 
     @abstractmethod
-    def get(self, url, data=None):
+    def get(self, url: str, data: Optional[dict[str, str]]=None) -> bytes:
         """ Download the contents of the specified URL with a GET request.
             You can specify any additional data parameters to pass to the destination. """
 
     @staticmethod
-    def _build_opener_with_app_useragent(*args, **kwargs):
-        opener = urllib.request.build_opener(*args, **kwargs)
+    def _build_opener_with_app_useragent(
+        *handlers: urllib.request.BaseHandler) -> urllib.request.OpenerDirector:
+        opener = urllib.request.build_opener(*handlers)
         opener.addheaders = [('User-agent', 'full-offline-backup-for-todoist')]
         return opener
 
 class URLLibURLDownloader(URLDownloader):
     """ Implementation of a class to download the contents of an URL through URLLib """
 
-    def get(self, url, data=None):
+    def get(self, url: str, data: Optional[dict[str, str]]=None) -> bytes:
         real_url = url
-        if data is not None:
+        if data:
             real_url += "?" + urllib.parse.urlencode(data)
 
         opener = self._build_opener_with_app_useragent()
         with opener.open(real_url) as url_handle:
-            return url_handle.read()
+            return cast(bytes, url_handle.read())
 
 class TodoistAuthURLDownloader(URLDownloader):
     """ Implementation of a class to download the contents of an URL through URLLib,
@@ -42,14 +45,19 @@ class TodoistAuthURLDownloader(URLDownloader):
     LOGIN_PARAM_EMAIL = "email"
     LOGIN_PARAM_PASSWORD = "password"
 
-    def __init__(self, tracer, email, password):
+    __tracer: Tracer
+    __email: str
+    __password: str
+    __opener: Optional[urllib.request.OpenerDirector]
+
+    def __init__(self, tracer: Tracer, email: str, password: str):
         self.__tracer = tracer
         self.__email = email
         self.__password = password
         self.__opener = None
 
-    def get(self, url, data=None):
-        if self.__opener is None:
+    def get(self, url: str, data: Optional[dict[str, str]]=None) -> bytes:
+        if not self.__opener:
             # Set up a cookie jar, to gather the login's cookies
             cookiejar = http.cookiejar.CookieJar()
             cookie_process = urllib.request.HTTPCookieProcessor(cookiejar)
@@ -81,8 +89,8 @@ class TodoistAuthURLDownloader(URLDownloader):
             self.__tracer.trace("Auth completed")
 
         real_url = url
-        if data is not None:
+        if data:
             real_url += "?" + urllib.parse.urlencode(data)
 
         with self.__opener.open(real_url) as url_handle:
-            return url_handle.read()
+            return cast(bytes, url_handle.read())

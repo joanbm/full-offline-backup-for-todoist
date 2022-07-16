@@ -2,36 +2,49 @@
 """ Provides frontend-independent access to the functions of the interface """
 
 from abc import ABCMeta, abstractmethod
+from typing import Literal, NamedTuple, Optional, Union
+from .tracer import Tracer
+from .virtual_fs import VirtualFs
+from .backup_downloader import TodoistBackupDownloader
+from .backup_attachments_downloader import TodoistBackupAttachmentsDownloader
+
+class TodoistAuth(NamedTuple):
+    """ Represents the properties of a Todoist attachment """
+    token: str
+    email: Optional[str]
+    password: Optional[str]
 
 class ControllerDependencyInjector(metaclass=ABCMeta):
     """ Rudimentary dependency injection container for the controller """
 
     @abstractmethod
-    def __init__(self, auth, verbose):
+    def __init__(self, auth: TodoistAuth, verbose: bool):
         """ Initializes the dependencies according to the user configuration """
 
     @property
     @abstractmethod
-    def tracer(self):
+    def tracer(self) -> Tracer:
         """ Gets an instance of the debug tracer """
 
     @property
     @abstractmethod
-    def backup_downloader(self):
+    def backup_downloader(self) -> TodoistBackupDownloader:
         """ Gets an instance of the Todoist backup downloader """
 
     @property
     @abstractmethod
-    def backup_attachments_downloader(self):
+    def backup_attachments_downloader(self) -> TodoistBackupAttachmentsDownloader:
         """ Gets an instance of the Todoist backup attachment downloader """
 
 class Controller:
     """ Provides frontend-independent access to the functions of the interface """
 
-    def __init__(self, dependencies):
+    __dependencies: ControllerDependencyInjector
+    def __init__(self, dependencies: ControllerDependencyInjector):
         self.__dependencies = dependencies
 
-    def download(self, vfs, with_attachments):
+    def download(self, vfs: VirtualFs,
+                       with_attachments: Union[bool, Literal['ignore-forbidden']]) -> None:
         """ Generates a Todoist backup ZIP from the current Todoist items """
         self.__dependencies.backup_downloader.download(vfs)
         if with_attachments:
