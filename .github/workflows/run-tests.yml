@@ -13,10 +13,13 @@ jobs:
       uses: actions/checkout@v2
 
     - name: Install dependencies
-      run: pip3 install pylint coverage
+      run: pip3 install pylint mypy coverage
+
+    - name: Run linters
+      run: pylint --errors-only full_offline_backup_for_todoist && mypy --strict -m full_offline_backup_for_todoist
 
     - name: Run tests
-      run: pylint --errors-only full_offline_backup_for_todoist && coverage run -m unittest && coverage lcov
+      run: coverage run -m unittest && coverage lcov
 
     - name: Upload coverage report
       uses: coverallsapp/github-action@1.1.3
