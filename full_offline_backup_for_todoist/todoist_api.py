@@ -41,7 +41,7 @@ class TodoistApi:
     def export_project_as_csv(self, project):
         """ Obtains the latest version of the specified project as a CSV file """
         self.__tracer.trace(f"Fetching project '{project.name}' (ID {project.identifier})"
-            "as CSV using the Todoist API...")
+            " as CSV using the Todoist API...")
 
         return self.__urldownloader.get(
             self.__EXPORT_PROJECT_AS_CSV_FILE_ENDPOINT, {
