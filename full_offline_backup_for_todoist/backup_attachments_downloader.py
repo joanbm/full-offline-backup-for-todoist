@@ -7,6 +7,7 @@ import re
 import json
 import itertools
 import os
+import urllib.error
 from .utils import sanitize_file_name
 
 class TodoistAttachmentInfo:
@@ -96,21 +97,28 @@ class TodoistBackupAttachmentsDownloader:
 
             included_attachment_names.add(attachment_info.file_name)
 
-    def __download_and_pack_attachments(self, attachment_infos, vfs):
+    def __download_and_pack_attachments(self, attachment_infos, vfs, ignore_forbidden):
         """ Downloads and packs the given attachments in a folder 'attachments'
             of the current Todoist backup VFS """
         for idx, attachment_info in enumerate(attachment_infos):
             self.__tracer.trace(f"[{idx+1}/{len(attachment_infos)}] "
                 f"Downloading attachment '{attachment_info.file_name}'...")
 
-            data = self.__urldownloader.get(attachment_info.file_url)
+            try:
+                data = self.__urldownloader.get(attachment_info.file_url)
+            except urllib.error.HTTPError as ex:
+                if ex.code == 403 and ignore_forbidden:
+                    print(f"WARNING: Download of {attachment_info.file_name} failed due to " +
+                           "HTTP 403 Forbidden error, ignoring...")
+                else:
+                    raise
 
             vfs.write_file(self.__ATTACHMENT_FOLDER + attachment_info.file_name, data)
 
             self.__tracer.trace(f"[{idx+1}/{len(attachment_infos)}] "
                 f"Downloaded attachment '{attachment_info.file_name}'...")
 
-    def download_attachments(self, vfs):
+    def download_attachments(self, vfs, ignore_forbidden = False):
         """ Downloads all the attachments of the current Todoist backup VFS
             and packs them in a folder 'attachments' to the same VFS """
 
@@ -123,4 +131,4 @@ class TodoistBackupAttachmentsDownloader:
         attachment_infos = self.__fetch_attachment_infos(vfs)
         self.__tracer.trace(f"Found {len(attachment_infos)} attachments.")
         self.__deduplicate_attachments_names(attachment_infos)
-        self.__download_and_pack_attachments(attachment_infos, vfs)
+        self.__download_and_pack_attachments(attachment_infos, vfs, ignore_forbidden)

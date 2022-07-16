@@ -42,8 +42,11 @@ class ConsoleFrontend:
         # create the parser for the "download" command
         parser_download = subparsers.add_parser('download', help='download specified backup')
         parser_download.set_defaults(func=self.handle_download)
-        parser_download.add_argument("--with-attachments", action="store_true",
-                                     help="download attachments and attach to the backup file")
+        parser_download.add_argument("--with-attachments", nargs="?", default=False, const=True,
+                                     choices=["ignore-forbidden"],
+                                     help="download attachments and attach to the backup file.\n" +
+                                          "if the value 'ignore-forbidden' is given, HTTP 403 " +
+                                          "Forbidden errors will be ignored (Todoist bug?)\n")
         parser_download.add_argument("--output-file", type=str,
                                      help="name of the file that will store the backup")
         self.__add_authorization_group(parser_download)

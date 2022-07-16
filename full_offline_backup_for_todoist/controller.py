@@ -35,4 +35,5 @@ class Controller:
         """ Generates a Todoist backup ZIP from the current Todoist items """
         self.__dependencies.backup_downloader.download(vfs)
         if with_attachments:
-            self.__dependencies.backup_attachments_downloader.download_attachments(vfs)
+            self.__dependencies.backup_attachments_downloader.download_attachments(vfs,
+                with_attachments == 'ignore-forbidden')
