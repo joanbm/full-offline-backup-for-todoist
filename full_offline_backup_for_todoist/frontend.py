@@ -5,7 +5,7 @@ import argparse
 import os
 import getpass
 from pathlib import Path
-from typing import Callable, List, Optional
+from typing import Callable, List, Mapping, Optional
 from .virtual_fs import ZipVirtualFs
 from .controller import TodoistAuth, Controller, ControllerDependencyInjector
 
@@ -57,7 +57,7 @@ class ConsoleFrontend:
 
         return parser.parse_args(arguments)
 
-    def run(self, prog: str, arguments: List[str], environment: os._Environ) -> None:
+    def run(self, prog: str, arguments: List[str], environment: Mapping[str, str]) -> None:
         """ Runs the Todoist backup tool frontend with the specified command line arguments """
         args = self.__parse_command_line_args(prog, arguments)
         args.func(args, environment)
@@ -71,7 +71,7 @@ class ConsoleFrontend:
             pass
 
     @staticmethod
-    def __get_auth(args: argparse.Namespace, environment: os._Environ) -> TodoistAuth:
+    def __get_auth(args: argparse.Namespace, environment: Mapping[str, str]) -> TodoistAuth:
         def get_credential(opt_file: Optional[str], opt_direct: Optional[str],
                            env_var: str, prompt: str, sensitive: bool) -> str:
             if opt_file:
@@ -102,7 +102,7 @@ class ConsoleFrontend:
                                   sensitive=True) if args.with_attachments else None
         return TodoistAuth(token, email, password)
 
-    def handle_download(self, args: argparse.Namespace, environment: os._Environ) -> None:
+    def handle_download(self, args: argparse.Namespace, environment: Mapping[str, str]) -> None:
         """ Handles the download subparser with the specified command line arguments """
 
         # Configure controller
