@@ -14,13 +14,13 @@ With Todoist Premium, you can **attach files or photos to tasks as comments**, w
 
 Furthermore, Todoist has a **backup functionality**, which allows exporting the task data to a local computer in the form of a ZIP file, e.g. for offline usage or in the event of an incident with Todoist servers.
 
-Unfortunately, the two don't mix: **The backup functionality doesn't back up any of the attachments assigned to tasks**. Instead, only an URL to download the attachments is included in the backup, which isn't useful or ideal for most scenarios.
+Unfortunately, the two don't mix: **The backup functionality doesn't back up any of the attachments assigned to tasks**. Instead, only a URL to download the attachment is included in the backup, which isn't useful or ideal for most scenarios.
 
 This tool aims to allow you to make a complete backup, including all attachments, so you can easily keep all your task data secure on your own computer.
 
 ## Full feature list
 
-* Can downloads the backups from Todoist's servers through the Todoist API.
+* Can download the backups from Todoist's servers through the Todoist API.
 
 * Can download all attachments of the tasks associated to your Todoist backup.
 
@@ -46,9 +46,9 @@ To create a backup from Todoist's servers, including attachments, and with traci
 
 ``python3 -m full_offline_backup_for_todoist --verbose download --with-attachments``
 
-**NOTE:** You will also be asked to for you Todoist email and password. This is **required** to download the attachments, as a workaround due to security restriction introduced by Todoist in 2018 (see [issue #1](https://github.com/joanbm/full-offline-backup-for-todoist/issues/1)). As of today, there is no official way provided by Todoist to automate attachment download, and the current workaround may break at any time.
+**NOTE:** You will also be asked to for your Todoist email and password. This is **required** to download the attachments, as a workaround due to security restriction introduced by Todoist in 2018 (see [issue #1](https://github.com/joanbm/full-offline-backup-for-todoist/issues/1)). As of today, there is no official way provided by Todoist to automate attachment download, and the current workaround may break at any time.
 
-**NOTE (2022-07-16): At least for me, it appears that currently some attachments (I believe old ones from 2018) are failing to download with HTTP 403 Forbidden errors. This appears to be a Todoist-wide issue, as the attachments are also inaccessible also from the website and the mobile app. If you know what you are doing and just want to ignore those errors (and, of course, not download any affected attachments), you can use the `--with-attachments="ignore-forbidden"` command line flag.**
+**NOTE (2022-07-16): At least for me, it appears that currently some attachments (I believe old ones from 2018) are failing to download with HTTP 403 Forbidden errors. This appears to be a Todoist-wide issue, as the attachments are also inaccessible from the website and the mobile app. If you know what you are doing and just want to ignore those errors (and, of course, not download any affected attachments), you can use the `--with-attachments="ignore-forbidden"` command line flag.**
 
 Print full help:
 
@@ -56,7 +56,7 @@ Print full help:
 
 ## How to get my Todoist API token?
 
-The easiest way to get one is to open the **web version of Todoist**, go to the **Settings** section, then to the **Integrations** sections and you will see a API token there in the **"Token API"** section.
+The easiest way to get one is to open the **web version of Todoist**, go to the **Settings** section, then to the **Integrations** sections, and you will see an API token there in the **"Token API"** section.
 
 ## How can I automate the backup process?
 
