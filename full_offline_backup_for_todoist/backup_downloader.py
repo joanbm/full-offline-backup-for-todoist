@@ -8,8 +8,6 @@ from .virtual_fs import VirtualFs
 
 class TodoistBackupDownloader:
     """ Class to download Todoist backup ZIPs using the Todoist API """
-    __ZIP_FLAG_BITS_UTF8 = 0x800
-
     __tracer: Tracer
     __todoist_api: TodoistApi
 
