@@ -4,11 +4,35 @@ from abc import ABCMeta, abstractmethod
 import urllib.request
 import urllib.parse
 import http.cookiejar
+import time
 from typing import cast, Dict, Optional
 from .tracer import Tracer
 
+NUM_RETRIES = 3
+
 class URLDownloader(metaclass=ABCMeta):
     """ Implementation of a class to download the contents of an URL """
+
+    _tracer: Tracer
+
+    def __init__(self, tracer: Tracer):
+        self._tracer = tracer
+
+    def _download(self, opener: urllib.request.OpenerDirector, url: str) -> bytes:
+        """ Downloads the specified URL as bytes using the specified opener """
+        with opener.open(url) as url_handle:
+            return cast(bytes, url_handle.read())
+
+    def download_with_retry(self, opener: urllib.request.OpenerDirector, url: str) -> bytes:
+        """ Downloads the specified URL as bytes using the specified opener, retrying on failure """
+        for i in range(NUM_RETRIES):
+            try:
+                return self._download(opener, url)
+            except urllib.error.URLError as exception:
+                self._tracer.trace(f"Got exception: {exception}, retrying...")
+                time.sleep(3**i)
+
+        return self._download(opener, url)
 
     @abstractmethod
     def get(self, url: str, data: Optional[Dict[str, str]]=None) -> bytes:
@@ -31,8 +55,7 @@ class URLLibURLDownloader(URLDownloader):
             real_url += "?" + urllib.parse.urlencode(data)
 
         opener = self._build_opener_with_app_useragent()
-        with opener.open(real_url) as url_handle:
-            return cast(bytes, url_handle.read())
+        return self.download_with_retry(opener, real_url)
 
 class TodoistAuthURLDownloader(URLDownloader):
     """ Implementation of a class to download the contents of an URL through URLLib,
@@ -45,13 +68,12 @@ class TodoistAuthURLDownloader(URLDownloader):
     LOGIN_PARAM_EMAIL = "email"
     LOGIN_PARAM_PASSWORD = "password"
 
-    __tracer: Tracer
     __email: str
     __password: str
     __opener: Optional[urllib.request.OpenerDirector]
 
     def __init__(self, tracer: Tracer, email: str, password: str):
-        self.__tracer = tracer
+        super().__init__(tracer)
         self.__email = email
         self.__password = password
         self.__opener = None
@@ -63,13 +85,13 @@ class TodoistAuthURLDownloader(URLDownloader):
             cookie_process = urllib.request.HTTPCookieProcessor(cookiejar)
             self.__opener = self._build_opener_with_app_useragent(cookie_process)
 
-            self.__tracer.trace("Auth Step 1: Get CSRF token")
+            self._tracer.trace("Auth Step 1: Get CSRF token")
 
             # Ping the login page, in order to get a CSRF token as a cookie
             with self.__opener.open(TodoistAuthURLDownloader.URL_SHOWLOGIN) as _:
                 pass
 
-            self.__tracer.trace("Auth Step 2: Building login request params")
+            self._tracer.trace("Auth Step 2: Building login request params")
 
             # Build the parameters (CSRF, email and password) for the login POST request
             csrf_value = next(c.value for c in cookiejar
@@ -80,17 +102,16 @@ class TodoistAuthURLDownloader(URLDownloader):
                 TodoistAuthURLDownloader.LOGIN_PARAM_PASSWORD: self.__password}
             params_str = urllib.parse.urlencode(params).encode('utf-8')
 
-            self.__tracer.trace("Auth Step 3: Send login request")
+            self._tracer.trace("Auth Step 3: Send login request")
 
             # Send the login POST request, which will give us our identifier cookie
             with self.__opener.open(TodoistAuthURLDownloader.URL_POSTLOGIN, params_str) as _:
                 pass
 
-            self.__tracer.trace("Auth completed")
+            self._tracer.trace("Auth completed")
 
         real_url = url
         if data:
             real_url += "?" + urllib.parse.urlencode(data)
 
-        with self.__opener.open(real_url) as url_handle:
-            return cast(bytes, url_handle.read())
+        return self.download_with_retry(self.__opener, real_url)

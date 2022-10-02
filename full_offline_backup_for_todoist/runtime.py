@@ -19,7 +19,7 @@ class RuntimeControllerDependencyInjector(ControllerDependencyInjector):
             self.__tracer.trace("NOTE: Using authentication workaround to download the attachments")
             urldownloader = TodoistAuthURLDownloader(self.__tracer, auth.email, auth.password)
         else:
-            urldownloader = URLLibURLDownloader()
+            urldownloader = URLLibURLDownloader(self.__tracer)
         todoist_api = TodoistApi(auth.token, self.__tracer, urldownloader)
         self.__backup_downloader = TodoistBackupDownloader(self.__tracer, todoist_api)
         self.__backup_attachments_downloader = TodoistBackupAttachmentsDownloader(
