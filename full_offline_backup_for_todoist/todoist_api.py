@@ -19,7 +19,7 @@ class TodoistProjectInfo:
 class TodoistApi:
     """ Provides access to a subset of the features of the Todoist API"""
 
-    __BASE_URL = "https://api.todoist.com/sync/v8"
+    __BASE_URL = "https://api.todoist.com/sync/v9"
     __SYNC_ENDPOINT = __BASE_URL + "/sync"
     __EXPORT_PROJECT_AS_CSV_FILE_ENDPOINT = __BASE_URL + "/templates/export_as_file"
 
