@@ -23,7 +23,7 @@ class URLDownloader(metaclass=ABCMeta):
         with opener.open(url) as url_handle:
             return cast(bytes, url_handle.read())
 
-    def download_with_retry(self, opener: urllib.request.OpenerDirector, url: str) -> bytes:
+    def _download_with_retry(self, opener: urllib.request.OpenerDirector, url: str) -> bytes:
         """ Downloads the specified URL as bytes using the specified opener, retrying on failure """
         for i in range(NUM_RETRIES):
             try:
@@ -55,7 +55,7 @@ class URLLibURLDownloader(URLDownloader):
             real_url += "?" + urllib.parse.urlencode(data)
 
         opener = self._build_opener_with_app_useragent()
-        return self.download_with_retry(opener, real_url)
+        return self._download_with_retry(opener, real_url)
 
 class TodoistAuthURLDownloader(URLDownloader):
     """ Implementation of a class to download the contents of an URL through URLLib,
@@ -114,4 +114,4 @@ class TodoistAuthURLDownloader(URLDownloader):
         if data:
             real_url += "?" + urllib.parse.urlencode(data)
 
-        return self.download_with_retry(self.__opener, real_url)
+        return self._download_with_retry(self.__opener, real_url)
