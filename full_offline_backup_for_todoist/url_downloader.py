@@ -14,48 +14,53 @@ class URLDownloader(metaclass=ABCMeta):
     """ Implementation of a class to download the contents of an URL """
 
     _tracer: Tracer
+    __bearer_token: Optional[str]
 
     def __init__(self, tracer: Tracer):
         self._tracer = tracer
+        self.__bearer_token = None
 
-    def _download(self, opener: urllib.request.OpenerDirector, url: str) -> bytes:
+    def _download(self, opener: urllib.request.OpenerDirector, url: str,
+                  data: Optional[Dict[str, str]]=None) -> bytes:
         """ Downloads the specified URL as bytes using the specified opener """
-        with opener.open(url) as url_handle:
+        encoded_data = urllib.parse.urlencode(data).encode() if data else None
+        with opener.open(url, encoded_data) as url_handle:
             return cast(bytes, url_handle.read())
 
-    def _download_with_retry(self, opener: urllib.request.OpenerDirector, url: str) -> bytes:
+    def _download_with_retry(self, opener: urllib.request.OpenerDirector, url: str,
+                             data: Optional[Dict[str, str]]=None) -> bytes:
         """ Downloads the specified URL as bytes using the specified opener, retrying on failure """
         for i in range(NUM_RETRIES):
             try:
-                return self._download(opener, url)
+                return self._download(opener, url, data)
             except urllib.error.URLError as exception:
                 self._tracer.trace(f"Got exception: {exception}, retrying...")
                 time.sleep(3**i)
 
-        return self._download(opener, url)
+        return self._download(opener, url, data)
+
+    def set_bearer_token(self, bearer_token: Optional[str]) -> None:
+        """ Sets the value of the 'Authorization: Bearer XXX' HTTP header """
+        self.__bearer_token = bearer_token
 
     @abstractmethod
     def get(self, url: str, data: Optional[Dict[str, str]]=None) -> bytes:
         """ Download the contents of the specified URL with a GET request.
             You can specify any additional data parameters to pass to the destination. """
 
-    @staticmethod
     def _build_opener_with_app_useragent(
-        *handlers: urllib.request.BaseHandler) -> urllib.request.OpenerDirector:
+        self, *handlers: urllib.request.BaseHandler) -> urllib.request.OpenerDirector:
         opener = urllib.request.build_opener(*handlers)
-        opener.addheaders = [('User-agent', 'full-offline-backup-for-todoist')]
+        opener.addheaders = ([('User-agent', 'full-offline-backup-for-todoist')] +
+            ([('Authorization', 'Bearer ' + self.__bearer_token)] if self.__bearer_token else []))
         return opener
 
 class URLLibURLDownloader(URLDownloader):
     """ Implementation of a class to download the contents of an URL through URLLib """
 
     def get(self, url: str, data: Optional[Dict[str, str]]=None) -> bytes:
-        real_url = url
-        if data:
-            real_url += "?" + urllib.parse.urlencode(data)
-
         opener = self._build_opener_with_app_useragent()
-        return self._download_with_retry(opener, real_url)
+        return self._download_with_retry(opener, url, data)
 
 class TodoistAuthURLDownloader(URLDownloader):
     """ Implementation of a class to download the contents of an URL through URLLib,
@@ -110,8 +115,4 @@ class TodoistAuthURLDownloader(URLDownloader):
 
             self._tracer.trace("Auth completed")
 
-        real_url = url
-        if data:
-            real_url += "?" + urllib.parse.urlencode(data)
-
-        return self._download_with_retry(self.__opener, real_url)
+        return self._download_with_retry(self.__opener, url, data)

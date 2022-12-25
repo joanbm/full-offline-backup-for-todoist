@@ -29,20 +29,41 @@ class TestStaticHTTPServer:
             def log_message(self, format, *args): # pylint: disable=redefined-builtin
                 """ Disables console output for the HTTP Request Handler """
 
-            def do_GET(self): # pylint: disable=invalid-name
-                """ Handles a request using the defined static mapping """
+            def __find_response_for_request_key(self, request_key):
+                authorization_header = self.headers.get('Authorization')
+                if authorization_header is not None and authorization_header.startswith("Bearer "):
+                    token = authorization_header[len("Bearer "):]
+                    key_with_auth = request_key + (token,)
+                    if key_with_auth in route_responses:
+                        return route_responses[key_with_auth]
+
+                key_without_auth = request_key + (None,)
+                return route_responses.get(key_without_auth)
+
+            def __handle_request(self, request_key):
                 if flaky and self.path not in handled:
                     handled.add(self.path)
                     self.send_response(503)
                     self.end_headers()
                     return
 
-                self.send_response(200 if self.path in route_responses else 404)
+                response = self.__find_response_for_request_key(request_key)
+                self.send_response(200 if response else 404)
 
                 self.send_header('Content-type', 'text/plain')
                 self.end_headers()
 
-                if self.path in route_responses:
-                    self.wfile.write(route_responses[self.path])
+                if response:
+                    self.wfile.write(response)
+
+            def do_GET(self): # pylint: disable=invalid-name
+                """ Handles a GET request using the defined static mapping """
+                self.__handle_request(('GET', self.path, None))
+
+            def do_POST(self): # pylint: disable=invalid-name
+                """ Handles a POST request using the defined static mapping """
+                body_length = int(self.headers.get('Content-Length'))
+                body = self.rfile.read(body_length)
+                self.__handle_request(('POST', self.path, body))
 
         return TestHTTPRequestHandler

@@ -29,25 +29,25 @@ class TestIntegration(unittest.TestCase):
         # Set up the fake HTTP server with local responses
         # pylint: disable=line-too-long
         route_responses = {
-            "/https://api.todoist.com/sync/v9/sync?token=mysecrettoken&sync_token=%2A&resource_types=%5B%22projects%22%5D":
+            ("POST", "/https://api.todoist.com/sync/v9/sync", b"sync_token=%2A&resource_types=%5B%22projects%22%5D", 'mysecrettoken'):
                 Path(self.__get_test_file("sources/project_list.json")).read_bytes(),
-            "/https://api.todoist.com/sync/v9/templates/export_as_file?token=mysecrettoken&project_id=2181147955":
+            ("POST", "/https://api.todoist.com/sync/v9/templates/export_as_file", b"project_id=2181147955", 'mysecrettoken'):
                 Path(self.__get_test_file("sources/Project_2181147955.csv")).read_bytes(),
-            "/https://api.todoist.com/sync/v9/templates/export_as_file?token=mysecrettoken&project_id=2181147714":
+            ("POST", "/https://api.todoist.com/sync/v9/templates/export_as_file", b"project_id=2181147714", 'mysecrettoken'):
                 Path(self.__get_test_file("sources/Project_2181147714.csv")).read_bytes(),
-            "/https://api.todoist.com/sync/v9/templates/export_as_file?token=mysecrettoken&project_id=2181147709":
+            ("POST", "/https://api.todoist.com/sync/v9/templates/export_as_file", b"project_id=2181147709", 'mysecrettoken'):
                 Path(self.__get_test_file("sources/Project_2181147709.csv")).read_bytes(),
-            "/https://api.todoist.com/sync/v9/templates/export_as_file?token=mysecrettoken&project_id=2181147715":
+            ("POST", "/https://api.todoist.com/sync/v9/templates/export_as_file", b"project_id=2181147715", 'mysecrettoken'):
                 Path(self.__get_test_file("sources/Project_2181147715.csv")).read_bytes(),
-            "/https://api.todoist.com/sync/v9/templates/export_as_file?token=mysecrettoken&project_id=2181147711":
+            ("POST", "/https://api.todoist.com/sync/v9/templates/export_as_file", b"project_id=2181147711", 'mysecrettoken'):
                 Path(self.__get_test_file("sources/Project_2181147711.csv")).read_bytes(),
-            "/https://api.todoist.com/sync/v9/templates/export_as_file?token=mysecrettoken&project_id=2181147712":
+            ("POST", "/https://api.todoist.com/sync/v9/templates/export_as_file", b"project_id=2181147712", 'mysecrettoken'):
                 Path(self.__get_test_file("sources/Project_2181147712.csv")).read_bytes(),
-            "/https://api.todoist.com/sync/v9/templates/export_as_file?token=mysecrettoken&project_id=2181147713":
+            ("POST", "/https://api.todoist.com/sync/v9/templates/export_as_file", b"project_id=2181147713", 'mysecrettoken'):
                 Path(self.__get_test_file("sources/Project_2181147713.csv")).read_bytes(),
-            "/https://d1x0mwiac2rqwt.cloudfront.net/g75-kL8pwVYNObSczLnVXe4FIyJd8YQL6b8yCilGyix09bMdJmxbtrGMW9jIeIwJ/by/16542905/as/bug.txt":
+            ("GET, /https://d1x0mwiac2rqwt.cloudfront.net/g75-kL8pwVYNObSczLnVXe4FIyJd8YQL6b8yCilGyix09bMdJmxbtrGMW9jIeIwJ/by/16542905/as/bug.txt", None, None):
                 Path(self.__get_test_file("sources/bug.txt")).read_bytes(),
-            "/https://d1x0mwiac2rqwt.cloudfront.net/s0snyb7n9tJXYijOK2LV6hjVar4YUkwYbHv3PBFYM-N4nJEtujC046OlEdZpKfZm/by/16542905/as/sample_image.png":
+            ("GET, /https://d1x0mwiac2rqwt.cloudfront.net/s0snyb7n9tJXYijOK2LV6hjVar4YUkwYbHv3PBFYM-N4nJEtujC046OlEdZpKfZm/by/16542905/as/sample_image.png", None, None):
                 Path(self.__get_test_file("sources/sample_image.png")).read_bytes(),
         }
 
@@ -57,12 +57,12 @@ class TestIntegration(unittest.TestCase):
         """ Destroys the sample HTTP server for the test """
         self.__httpd.shutdown()
 
-    def __opener_open_redirect_to_local(self, original_self, url):
+    def __opener_open_redirect_to_local(self, original_self, url, data):
         """ Replaces the OpenerDirector.open function of URLLib, in order to redirect all requests
             to a local server.
             This way, we are still able to do the integration test with actual HTTP requests,
             though being handled by a local test HTTP server """
-        return self.__original_opener_open(original_self, "http://127.0.0.1:33327/" + url)
+        return self.__original_opener_open(original_self, "http://127.0.0.1:33327/" + url, data)
 
     @staticmethod
     def __get_test_file(subpath):

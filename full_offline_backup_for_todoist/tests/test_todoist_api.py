@@ -60,8 +60,8 @@ class TestTodoistApi(unittest.TestCase):
         todoist_api.get_projects()
 
         # Assert
+        mock_urldownloader.set_bearer_token.assert_called_with('FAKE TOKEN')
         mock_urldownloader.get.assert_called_with(ANY, {
-            'token': 'FAKE TOKEN',
             'sync_token': '*',
             'resource_types': '["projects"]'
         })

@@ -23,21 +23,19 @@ class TodoistApi:
     __SYNC_ENDPOINT = __BASE_URL + "/sync"
     __EXPORT_PROJECT_AS_CSV_FILE_ENDPOINT = __BASE_URL + "/templates/export_as_file"
 
-    __api_token: str
     __tracer: Tracer
     __urldownloader: URLDownloader
 
     def __init__(self, api_token: str, tracer: Tracer, urldownloader: URLDownloader):
-        self.__api_token = api_token
         self.__tracer = tracer
         self.__urldownloader = urldownloader
+        self.__urldownloader.set_bearer_token(api_token)
 
     def get_projects(self) -> List[TodoistProjectInfo]:
         """ Obtains the list of all projects from the Todoist API """
         self.__tracer.trace("Fetching projects using the Todoist API...")
         project_list_json = self.__urldownloader.get(
             self.__SYNC_ENDPOINT, {
-                "token": self.__api_token,
                 "sync_token": '*',
                 "resource_types": '["projects"]',
             })
@@ -55,6 +53,5 @@ class TodoistApi:
 
         return self.__urldownloader.get(
             self.__EXPORT_PROJECT_AS_CSV_FILE_ENDPOINT, {
-                "token": self.__api_token,
                 "project_id": project.identifier
             })
