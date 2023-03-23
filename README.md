@@ -48,8 +48,6 @@ To create a backup from Todoist's servers, including attachments, and with traci
 
 **NOTE:** You will also be asked to for your Todoist email and password. This is **required** to download the attachments, as a workaround due to security restrictions introduced by Todoist in 2018 (see [issue #1](https://github.com/joanbm/full-offline-backup-for-todoist/issues/1)). As of today, there is no official way provided by Todoist to automate attachment download, and the current workaround may break at any time.
 
-**NOTE (2022-07-16): At least for me, it appears that currently some attachments (I believe old ones from 2018) are failing to download with HTTP 403 Forbidden errors. This appears to be a Todoist-wide issue, as the attachments are also inaccessible from the website and the mobile app. If you know what you are doing and just want to ignore those errors (and, of course, not download any affected attachments), you can use the `--with-attachments="ignore-forbidden"` command line flag.**
-
 Print full help:
 
 ``python3 -m full_offline_backup_for_todoist -h``

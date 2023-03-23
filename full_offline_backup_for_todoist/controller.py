@@ -43,10 +43,8 @@ class Controller:
     def __init__(self, dependencies: ControllerDependencyInjector):
         self.__dependencies = dependencies
 
-    def download(self, vfs: VirtualFs, with_attachments: Union[bool, str]) -> None:
-        # On Python 3.8+ "Literal['ignore-forbidden']" instead of ^^^str^^^ above
+    def download(self, vfs: VirtualFs, with_attachments: bool) -> None:
         """ Generates a Todoist backup ZIP from the current Todoist items """
         self.__dependencies.backup_downloader.download(vfs)
         if with_attachments:
-            self.__dependencies.backup_attachments_downloader.download_attachments(vfs,
-                with_attachments == 'ignore-forbidden')
+            self.__dependencies.backup_attachments_downloader.download_attachments(vfs)

@@ -7,7 +7,6 @@ import re
 import json
 import itertools
 import os
-import urllib.error
 from typing import Set, List, Optional
 from .utils import sanitize_file_name
 from .virtual_fs import VirtualFs
@@ -109,28 +108,21 @@ class TodoistBackupAttachmentsDownloader:
             included_attachment_names.add(attachment_info.file_name)
 
     def __download_and_pack_attachments(self, attachment_infos: List[TodoistAttachmentInfo],
-                                              vfs: VirtualFs, ignore_forbidden: bool) -> None:
+                                              vfs: VirtualFs) -> None:
         """ Downloads and packs the given attachments in a folder 'attachments'
             of the current Todoist backup VFS """
         for idx, attachment_info in enumerate(attachment_infos):
             self.__tracer.trace(f"[{idx+1}/{len(attachment_infos)}] "
                 f"Downloading attachment '{attachment_info.file_name}'...")
 
-            try:
-                data = self.__urldownloader.get(attachment_info.file_url)
+            data = self.__urldownloader.get(attachment_info.file_url)
 
-                vfs.write_file(self.__ATTACHMENT_FOLDER + attachment_info.file_name, data)
+            vfs.write_file(self.__ATTACHMENT_FOLDER + attachment_info.file_name, data)
 
-                self.__tracer.trace(f"[{idx+1}/{len(attachment_infos)}] "
-                    f"Downloaded attachment '{attachment_info.file_name}'...")
-            except urllib.error.HTTPError as ex:
-                if ex.code == 403 and ignore_forbidden:
-                    print(f"WARNING: Download of {attachment_info.file_name} failed due to " +
-                           "HTTP 403 Forbidden error, ignoring...")
-                else:
-                    raise
+            self.__tracer.trace(f"[{idx+1}/{len(attachment_infos)}] "
+                f"Downloaded attachment '{attachment_info.file_name}'...")
 
-    def download_attachments(self, vfs: VirtualFs, ignore_forbidden: bool=False) -> None:
+    def download_attachments(self, vfs: VirtualFs) -> None:
         """ Downloads all the attachments of the current Todoist backup VFS
             and packs them in a folder 'attachments' to the same VFS """
 
@@ -143,4 +135,4 @@ class TodoistBackupAttachmentsDownloader:
         attachment_infos = self.__fetch_attachment_infos(vfs)
         self.__tracer.trace(f"Found {len(attachment_infos)} attachments.")
         self.__deduplicate_attachments_names(attachment_infos)
-        self.__download_and_pack_attachments(attachment_infos, vfs, ignore_forbidden)
+        self.__download_and_pack_attachments(attachment_infos, vfs)
