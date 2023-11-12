@@ -92,10 +92,10 @@ class ConsoleFrontend:
             return getpass.getpass(prompt + ": ") if sensitive else input(prompt + ": ")
 
         token = get_credential(args.token_file, args.token, "TODOIST_TOKEN",
-                               "Todoist token (from Settings -> Integrations)", sensitive=True)
-        email = get_credential(None, args.email, "TODOIST_EMAIL", "Todoist email",
+                               "Todoist token (from https://todoist.com/app/settings/integrations/developer)", sensitive=True)
+        email = get_credential(None, args.email, "TODOIST_EMAIL", "Todoist email https://todoist.com/app/settings/account",
                                sensitive=False) if args.with_attachments else None
-        password = get_credential(None, args.password, "TODOIST_PASSWORD", "Todoist password",
+        password = get_credential(None, args.password, "TODOIST_PASSWORD", "Todoist password (can be empty)",
                                   sensitive=True) if args.with_attachments else None
         return TodoistAuth(token, email, password)
 
