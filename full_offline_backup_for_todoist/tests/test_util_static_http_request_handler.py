@@ -8,7 +8,9 @@ class TestStaticHTTPServer:
     def __init__(self, server_address, route_responses, flaky=False):
         handler = TestStaticHTTPServer.make_test_http_request_handler(route_responses, flaky)
         self.__httpd = HTTPServer(server_address, handler)
-        self.__httpd_thread = threading.Thread(target=self.__httpd.serve_forever)
+        self.__httpd_thread = threading.Thread(target=self.__httpd.serve_forever,
+                                               # Use a lower value for faster shutdown on tests
+                                               kwargs={"poll_interval": 0.05})
         self.__httpd_thread.start()
         self._handled = set()
 
