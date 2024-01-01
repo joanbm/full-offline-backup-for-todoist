@@ -6,11 +6,10 @@ pkgdesc="Small, dependency-less Python script to make a backup of all Todoist ta
 arch=('any')
 url="https://github.com/joanbm/full-offline-backup-for-todoist"
 license=('GPLv3')
-depends=('python' 'python-setuptools')
+depends=('python')
 makedepends=('git' 'python-setuptools')
 provides=('full-offline-backup-for-todoist')
 conflicts=('full-offline-backup-for-todoist')
-options=(!emptydirs)
 source=('git+https://github.com/joanbm/full-offline-backup-for-todoist.git')
 sha256sums=('SKIP')
 
