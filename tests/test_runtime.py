@@ -2,8 +2,8 @@
 """ Tests for the runtime dependency injection container """
 # pylint: disable=invalid-name
 import unittest
-from ..controller import TodoistAuth
-from ..runtime import RuntimeControllerDependencyInjector
+from full_offline_backup_for_todoist.controller import TodoistAuth
+from full_offline_backup_for_todoist.runtime import RuntimeControllerDependencyInjector
 
 class TestRuntime(unittest.TestCase):
     """ Tests for the runtime dependency injection container """

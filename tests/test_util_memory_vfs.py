@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 """ Implementation of a VFS over memory, for the tests """
 # pylint: disable=invalid-name
-from ..virtual_fs import VirtualFs
+from full_offline_backup_for_todoist.virtual_fs import VirtualFs
 
 class InMemoryVfs(VirtualFs):
     """ Implementation of a VFS over memory, for the tests """

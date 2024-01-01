@@ -5,7 +5,7 @@ import unittest
 import tempfile
 import os
 import zipfile
-from ..virtual_fs import ZipVirtualFs
+from full_offline_backup_for_todoist.virtual_fs import ZipVirtualFs
 
 class Test(unittest.TestCase):
     """ Tests for the VFS (Virtual FS) """

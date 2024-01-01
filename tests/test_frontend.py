@@ -3,7 +3,7 @@
 # pylint: disable=invalid-name
 import unittest
 from unittest.mock import Mock, MagicMock, ANY
-from ..frontend import ConsoleFrontend
+from full_offline_backup_for_todoist.frontend import ConsoleFrontend
 
 class TestFrontend(unittest.TestCase):
     """ Tests for the console frontend """

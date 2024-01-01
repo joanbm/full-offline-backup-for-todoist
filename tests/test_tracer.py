@@ -4,7 +4,7 @@
 import unittest
 from unittest.mock import patch
 import io
-from ..tracer import NullTracer, ConsoleTracer
+from full_offline_backup_for_todoist.tracer import NullTracer, ConsoleTracer
 
 class TestTracer(unittest.TestCase):
     """ Tests for the tracer classes """

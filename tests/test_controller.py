@@ -3,8 +3,8 @@
 # pylint: disable=invalid-name
 import unittest
 from unittest.mock import Mock, ANY
-from ..tracer import NullTracer
-from ..controller import ControllerDependencyInjector, Controller
+from full_offline_backup_for_todoist.tracer import NullTracer
+from full_offline_backup_for_todoist.controller import ControllerDependencyInjector, Controller
 
 class TestControllerDependencyInjector(ControllerDependencyInjector):
     """ Rudimentary dependency injection container for the tests """

@@ -3,8 +3,8 @@
 # pylint: disable=invalid-name
 import unittest
 from unittest.mock import MagicMock, ANY
-from ..todoist_api import TodoistApi
-from ..tracer import NullTracer
+from full_offline_backup_for_todoist.todoist_api import TodoistApi
+from full_offline_backup_for_todoist.tracer import NullTracer
 
 class TestTodoistApi(unittest.TestCase):
     """ Tests for the Todoist API wrapper """

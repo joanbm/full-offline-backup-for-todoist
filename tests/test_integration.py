@@ -10,7 +10,7 @@ from pathlib import Path
 import tempfile
 import zipfile
 import sys
-from ..__init__ import main
+from full_offline_backup_for_todoist.__init__ import main
 from .test_url_downloader import TestStaticHTTPServer
 
 class TestIntegration(unittest.TestCase):

@@ -3,8 +3,8 @@
 # pylint: disable=invalid-name
 import unittest
 from unittest.mock import MagicMock
-from ..backup_downloader import TodoistBackupDownloader
-from ..tracer import NullTracer
+from full_offline_backup_for_todoist.backup_downloader import TodoistBackupDownloader
+from full_offline_backup_for_todoist.tracer import NullTracer
 from .test_util_memory_vfs import InMemoryVfs
 
 class TestBackupDownloader(unittest.TestCase):
