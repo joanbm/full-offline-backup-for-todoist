@@ -66,9 +66,9 @@ class ConsoleFrontend:
     @staticmethod
     def __get_auth(args: argparse.Namespace, environment: Mapping[str, str]) -> TodoistAuth:
         def get_credential(opt_file: Optional[str], opt_direct: Optional[str],
-                           env_var: str, prompt: str, sensitive: bool) -> str:
+                           env_var: str, prompt: str) -> str:
             if opt_file:
-                if sensitive and os.name == "posix": # OpenSSH-like check
+                if os.name == "posix": # OpenSSH-like check
                     file_stat = os.stat(opt_file)
                     if file_stat.st_uid == os.getuid() and file_stat.st_mode & 0o077 != 0:
                         ConsoleFrontend.__huge_warning(
@@ -76,7 +76,7 @@ class ConsoleFrontend:
                             "accessible by other users is deprecated.")
                 return Path(opt_file).read_text('utf-8')
 
-            if sensitive and opt_direct:
+            if opt_direct:
                 ConsoleFrontend.__huge_warning(
                      "WARNING: Passing credentials through the command line is deprecated.\n"
                     f"         Pass it through the {env_var} environment variable,\n"
@@ -85,14 +85,14 @@ class ConsoleFrontend:
 
             if env_var in environment:
                 return environment[env_var]
-            return getpass.getpass(prompt + ": ") if sensitive else input(prompt + ": ")
+            return getpass.getpass(prompt + ": ")
 
         for deprecated_env in ("TODOIST_EMAIL", "TODOIST_PASSWORD"):
             if deprecated_env in environment:
                 print(f"WARNING: The {deprecated_env} environment variable is no longer necessary")
 
         token = get_credential(args.token_file, args.token, "TODOIST_TOKEN",
-                               "Todoist token (from https://todoist.com/app/settings/integrations/developer)", sensitive=True)
+                               "Todoist token (from https://todoist.com/app/settings/integrations/developer)")
         return TodoistAuth(token)
 
     def handle_download(self, args: argparse.Namespace, environment: Mapping[str, str]) -> None:
