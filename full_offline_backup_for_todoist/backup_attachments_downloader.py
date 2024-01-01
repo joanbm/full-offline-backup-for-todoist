@@ -89,7 +89,7 @@ class TodoistBackupAttachmentsDownloader:
             if new_file_name not in file_names_to_avoid:
                 return new_file_name
 
-        raise Exception('Unreachable code') # pragma: no cover
+        assert False, "Unreachable code" # pragma: no cover
 
     def __deduplicate_attachments_names(self,
                                         attachment_infos: List[TodoistAttachmentInfo]) -> None:
