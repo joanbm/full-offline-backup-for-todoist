@@ -86,9 +86,7 @@ class TestIntegration(unittest.TestCase):
                     self.assertEqual(content_1, content_2)
 
     @patch.object(sys, 'argv', ["program", "download", "--with-attachments"])
-    @patch.object(os, 'environ', {"TODOIST_TOKEN": "mysecrettoken",
-                                  "TODOIST_EMAIL": "asd@asd.asd",
-                                  "TODOIST_PASSWORD": "mysecretpassword"})
+    @patch.object(os, 'environ', {"TODOIST_TOKEN": "mysecrettoken"})
     @patch.object(urllib.request.OpenerDirector, 'open', autospec=True)
     @unittest.skip("Not yet adapted to mock the attachment download workaround")
     def test_integration_download_with_attachments(self, mock_opener_open):

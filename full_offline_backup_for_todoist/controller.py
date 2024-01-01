@@ -2,7 +2,7 @@
 """ Provides frontend-independent access to the functions of the interface """
 
 from abc import ABCMeta, abstractmethod
-from typing import NamedTuple, Optional
+from typing import NamedTuple
 from .tracer import Tracer
 from .virtual_fs import VirtualFs
 from .backup_downloader import TodoistBackupDownloader
@@ -11,8 +11,6 @@ from .backup_attachments_downloader import TodoistBackupAttachmentsDownloader
 class TodoistAuth(NamedTuple):
     """ Represents the properties of a Todoist attachment """
     token: str
-    email: Optional[str]
-    password: Optional[str]
 
 class ControllerDependencyInjector(metaclass=ABCMeta):
     """ Rudimentary dependency injection container for the controller """
