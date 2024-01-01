@@ -87,11 +87,12 @@ class ConsoleFrontend:
                 return environment[env_var]
             return getpass.getpass(prompt + ": ") if sensitive else input(prompt + ": ")
 
-        token = get_credential(args.token_file, args.token, "TODOIST_TOKEN",
-                               "Todoist token (from https://todoist.com/app/settings/integrations/developer)", sensitive=True)
         for deprecated_env in ("TODOIST_EMAIL", "TODOIST_PASSWORD"):
             if deprecated_env in environment:
                 print(f"WARNING: The {deprecated_env} environment variable is no longer necessary")
+
+        token = get_credential(args.token_file, args.token, "TODOIST_TOKEN",
+                               "Todoist token (from https://todoist.com/app/settings/integrations/developer)", sensitive=True)
         return TodoistAuth(token)
 
     def handle_download(self, args: argparse.Namespace, environment: Mapping[str, str]) -> None:
