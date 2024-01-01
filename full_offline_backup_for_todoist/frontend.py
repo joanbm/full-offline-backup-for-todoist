@@ -22,21 +22,17 @@ class ConsoleFrontend:
         token_group = parser.add_mutually_exclusive_group()
         token_group.add_argument("--token-file", type=str,
                                  help="path to a file containing the Todoist token")
-        parser.add_argument("--email", type=str, help="Todoist email")
-        parser.add_argument("--password-file", type=str,
-                            help="path to a file containing the Todoist password")
 
-        # Those options are deprecated, since they are easy to use incorrectly
-        # (e.g. by getting the password logged to the history file)
+        # This option is deprecated, since it is easy to use incorrectly
+        # (e.g. by getting the token logged to the history file)
         # Using either interactive console input, environment variables or files is recommended
         token_group.add_argument("--token", type=str, help=argparse.SUPPRESS)
-        parser.add_argument("--password", type=str, help=argparse.SUPPRESS)
 
     def __parse_command_line_args(self, prog: str, arguments: List[str]) -> argparse.Namespace:
         epilog_str = f"Example: {prog} download\n"
         epilog_str += "(The necessary credentials will be asked through the command line.\n"
         epilog_str += " If you wish to automate backups, credentials can be passed through the\n"
-        epilog_str += " TODOIST_TOKEN, TODOIST_EMAIL and TODOIST_PASSWORD environment variables)"
+        epilog_str += " TODOIST_TOKEN environment variable)"
         parser = argparse.ArgumentParser(prog=prog, formatter_class=argparse.RawTextHelpFormatter,
                                          epilog=epilog_str)
         parser.add_argument("--verbose", action="store_true", help="print details to console")
@@ -70,9 +66,9 @@ class ConsoleFrontend:
     @staticmethod
     def __get_auth(args: argparse.Namespace, environment: Mapping[str, str]) -> TodoistAuth:
         def get_credential(opt_file: Optional[str], opt_direct: Optional[str],
-                           env_var: str, prompt: str, sensitive: bool) -> str:
+                           env_var: str, prompt: str) -> str:
             if opt_file:
-                if sensitive and os.name == "posix": # OpenSSH-like check
+                if os.name == "posix": # OpenSSH-like check
                     file_stat = os.stat(opt_file)
                     if file_stat.st_uid == os.getuid() and file_stat.st_mode & 0o077 != 0:
                         ConsoleFrontend.__huge_warning(
@@ -80,7 +76,7 @@ class ConsoleFrontend:
                             "accessible by other users is deprecated.")
                 return Path(opt_file).read_text('utf-8')
 
-            if sensitive and opt_direct:
+            if opt_direct:
                 ConsoleFrontend.__huge_warning(
                      "WARNING: Passing credentials through the command line is deprecated.\n"
                     f"         Pass it through the {env_var} environment variable,\n"
@@ -89,15 +85,15 @@ class ConsoleFrontend:
 
             if env_var in environment:
                 return environment[env_var]
-            return getpass.getpass(prompt + ": ") if sensitive else input(prompt + ": ")
+            return getpass.getpass(prompt + ": ")
+
+        for deprecated_env in ("TODOIST_EMAIL", "TODOIST_PASSWORD"):
+            if deprecated_env in environment:
+                print(f"WARNING: The {deprecated_env} environment variable is no longer necessary")
 
         token = get_credential(args.token_file, args.token, "TODOIST_TOKEN",
-                               "Todoist token (from https://todoist.com/app/settings/integrations/developer)", sensitive=True)
-        email = get_credential(None, args.email, "TODOIST_EMAIL", "Todoist email https://todoist.com/app/settings/account",
-                               sensitive=False) if args.with_attachments else None
-        password = get_credential(None, args.password, "TODOIST_PASSWORD", "Todoist password (can be empty)",
-                                  sensitive=True) if args.with_attachments else None
-        return TodoistAuth(token, email, password)
+                               "Todoist token (from https://todoist.com/app/settings/integrations/developer)")
+        return TodoistAuth(token)
 
     def handle_download(self, args: argparse.Namespace, environment: Mapping[str, str]) -> None:
         """ Handles the download subparser with the specified command line arguments """

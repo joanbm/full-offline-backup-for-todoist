@@ -46,8 +46,6 @@ To create a backup from Todoist's servers, including attachments, and with traci
 
 ``python3 -m full_offline_backup_for_todoist --verbose download --with-attachments``
 
-**NOTE:** You will also be asked to for your Todoist email and password. This is **required** to download the attachments, as a workaround due to security restrictions introduced by Todoist in 2018 (see [issue #1](https://github.com/joanbm/full-offline-backup-for-todoist/issues/1)). As of today, there is no official way provided by Todoist to automate attachment download, and the current workaround may break at any time.
-
 Print full help:
 
 ``python3 -m full_offline_backup_for_todoist -h``
@@ -58,7 +56,7 @@ The easiest way to get one is to open the **web version of Todoist**, go to the 
 
 ## How can I automate the backup process?
 
-To automate the backup process, you can use any automation tool you want (e.g. cron, Jenkins) that can run the utility. In order to pass the credentials non-interactively, you can set the `TODOIST_TOKEN`, `TODOIST_EMAIL` and `TODOIST_PASSWORD` environment variables before running it from your automation tool.
+To automate the backup process, you can use any automation tool you want (e.g. cron, Jenkins) that can run the utility. In order to pass the credentials non-interactively, you can set the `TODOIST_TOKEN` environment variable before running it from your automation tool.
 
 # Disclaimer
 

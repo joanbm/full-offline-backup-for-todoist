@@ -45,9 +45,9 @@ class TestIntegration(unittest.TestCase):
                 Path(self.__get_test_file("sources/Project_2181147712.csv")).read_bytes(),
             ("POST", "/https://api.todoist.com/sync/v9/templates/export_as_file", b"project_id=2181147713", 'mysecrettoken'):
                 Path(self.__get_test_file("sources/Project_2181147713.csv")).read_bytes(),
-            ("GET, /https://d1x0mwiac2rqwt.cloudfront.net/g75-kL8pwVYNObSczLnVXe4FIyJd8YQL6b8yCilGyix09bMdJmxbtrGMW9jIeIwJ/by/16542905/as/bug.txt", None, None):
+            ("GET", "/https://d1x0mwiac2rqwt.cloudfront.net/g75-kL8pwVYNObSczLnVXe4FIyJd8YQL6b8yCilGyix09bMdJmxbtrGMW9jIeIwJ/by/16542905/as/bug.txt", None, None):
                 Path(self.__get_test_file("sources/bug.txt")).read_bytes(),
-            ("GET, /https://d1x0mwiac2rqwt.cloudfront.net/s0snyb7n9tJXYijOK2LV6hjVar4YUkwYbHv3PBFYM-N4nJEtujC046OlEdZpKfZm/by/16542905/as/sample_image.png", None, None):
+            ("GET", "/https://d1x0mwiac2rqwt.cloudfront.net/s0snyb7n9tJXYijOK2LV6hjVar4YUkwYbHv3PBFYM-N4nJEtujC046OlEdZpKfZm/by/16542905/as/sample_image.png", None, None):
                 Path(self.__get_test_file("sources/sample_image.png")).read_bytes(),
         }
 
@@ -86,11 +86,8 @@ class TestIntegration(unittest.TestCase):
                     self.assertEqual(content_1, content_2)
 
     @patch.object(sys, 'argv', ["program", "download", "--with-attachments"])
-    @patch.object(os, 'environ', {"TODOIST_TOKEN": "mysecrettoken",
-                                  "TODOIST_EMAIL": "asd@asd.asd",
-                                  "TODOIST_PASSWORD": "mysecretpassword"})
+    @patch.object(os, 'environ', {"TODOIST_TOKEN": "mysecrettoken"})
     @patch.object(urllib.request.OpenerDirector, 'open', autospec=True)
-    @unittest.skip("Not yet adapted to mock the attachment download workaround")
     def test_integration_download_with_attachments(self, mock_opener_open):
         """ Integration test for downloading the backup with attachments """
 

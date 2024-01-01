@@ -33,9 +33,7 @@ class TestFrontend(unittest.TestCase):
 
         # Act
         frontend.run("util", ["download", "--with-attachments"],
-                     {"TODOIST_TOKEN": "1234",
-                      "TODOIST_EMAIL": "asd@asd.asd",
-                      "TODOIST_PASSWORD": "1234"})
+                     {"TODOIST_TOKEN": "1234"})
 
         # Assert
         controller.download.assert_called_with(ANY, with_attachments=True)
