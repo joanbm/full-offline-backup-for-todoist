@@ -2,10 +2,13 @@
 """ Tests for the URL downloader """
 # pylint: disable=invalid-name
 import unittest
+import time
+from unittest.mock import patch
 from .test_util_static_http_request_handler import TestStaticHTTPServer
 from ..url_downloader import URLLibURLDownloader
 from ..tracer import NullTracer
 
+@patch.object(time, 'sleep', lambda secs: None) # For faster tests
 class TestFrontend(unittest.TestCase):
     """ Tests for the URL downloader """
 

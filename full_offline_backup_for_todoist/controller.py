@@ -2,7 +2,7 @@
 """ Provides frontend-independent access to the functions of the interface """
 
 from abc import ABCMeta, abstractmethod
-from typing import NamedTuple, Optional, Union
+from typing import NamedTuple, Optional
 from .tracer import Tracer
 from .virtual_fs import VirtualFs
 from .backup_downloader import TodoistBackupDownloader
