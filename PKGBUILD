@@ -7,7 +7,7 @@ arch=('any')
 url="https://github.com/joanbm/full-offline-backup-for-todoist"
 license=('GPLv3')
 depends=('python')
-makedepends=('git' 'python-setuptools')
+makedepends=('git' 'python-build' 'python-installer' 'python-wheel' 'python-setuptools')
 provides=('full-offline-backup-for-todoist')
 conflicts=('full-offline-backup-for-todoist')
 source=('git+https://github.com/joanbm/full-offline-backup-for-todoist.git')
@@ -18,6 +18,11 @@ pkgver() {
 	printf "r%s.%s" "$(git rev-list --count HEAD)" "$(git rev-parse --short HEAD)"
 }
 
+build() {
+	cd "$srcdir/${pkgname%-git}"
+	python -m build --wheel --no-isolation
+}
+
 check() {
 	cd "$srcdir/${pkgname%-git}"
 	python -m unittest
@@ -25,5 +30,5 @@ check() {
 
 package() {
 	cd "$srcdir/${pkgname%-git}"
-	python setup.py install --root="$pkgdir/" --optimize=1
+	python -m installer --destdir="$pkgdir" dist/*.whl
 }
