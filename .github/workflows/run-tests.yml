@@ -10,7 +10,7 @@ jobs:
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Install dependencies
       run: pip3 install pylint mypy coverage
@@ -22,7 +22,7 @@ jobs:
       run: coverage run -m unittest && coverage lcov
 
     - name: Upload coverage report
-      uses: coverallsapp/github-action@v1.2.4
+      uses: coverallsapp/github-action@v2.3.0
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
-        path-to-lcov: coverage.lcov
+        files: coverage.lcov
