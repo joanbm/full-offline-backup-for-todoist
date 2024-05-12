@@ -12,7 +12,6 @@ class RuntimeControllerDependencyInjector(ControllerDependencyInjector):
     """ Implementation of the dependency injection container for the actual runtime objects """
 
     def __init__(self, auth: TodoistAuth, verbose: bool):
-        super().__init__(auth, verbose)
         self.__tracer = ConsoleTracer() if verbose else NullTracer()
         urldownloader = URLLibURLDownloader(self.__tracer)
         todoist_api = TodoistApi(auth.token, self.__tracer, urldownloader)

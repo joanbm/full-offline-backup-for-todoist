@@ -11,7 +11,6 @@ class TestControllerDependencyInjector(ControllerDependencyInjector):
 
     def __init__(self, test_tracer, test_todoist_downloader,
                  test_todoist_attachments_downloader):
-        super().__init__("", False)
         self.__test_tracer = test_tracer
         self.__test_todoist_downloader = test_todoist_downloader
         self.__test_todoist_attachments_downloader = test_todoist_attachments_downloader

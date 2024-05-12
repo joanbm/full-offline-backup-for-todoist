@@ -15,10 +15,6 @@ class TodoistAuth(NamedTuple):
 class ControllerDependencyInjector(metaclass=ABCMeta):
     """ Rudimentary dependency injection container for the controller """
 
-    @abstractmethod
-    def __init__(self, auth: TodoistAuth, verbose: bool):
-        """ Initializes the dependencies according to the user configuration """
-
     @property
     @abstractmethod
     def tracer(self) -> Tracer:
