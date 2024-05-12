@@ -21,7 +21,7 @@ class TodoistBackupDownloader:
 
         # Sanitize the file name for platforms such as Windows,
         # which don't accept some characters in file names, such as a colon (:)
-        backup_version = datetime.datetime.utcnow().replace(microsecond=0).isoformat(' ')
+        backup_version = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
         vfs.set_path_hint(sanitize_file_name("TodoistBackup_" + backup_version))
 
         # Download the file
