@@ -15,8 +15,9 @@ class URLDownloader(metaclass=ABCMeta):
     _tracer: Tracer
     _bearer_token: Optional[str]
 
-    def __init__(self, tracer: Tracer):
+    def __init__(self, tracer: Tracer, timeout: int = 300):
         self._tracer = tracer
+        self._timeout = timeout
         self._bearer_token = None
 
     def set_bearer_token(self, bearer_token: Optional[str]) -> None:
@@ -35,7 +36,7 @@ class URLLibURLDownloader(URLDownloader):
                   data: Optional[Dict[str, str]]=None) -> bytes:
         """ Downloads the specified URL as bytes using the specified opener """
         encoded_data = urllib.parse.urlencode(data).encode() if data else None
-        with opener.open(url, encoded_data) as url_handle:
+        with opener.open(url, encoded_data, self._timeout) as url_handle:
             return cast(bytes, url_handle.read())
 
     def _download_with_retry(self, opener: urllib.request.OpenerDirector, url: str,

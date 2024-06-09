@@ -57,12 +57,13 @@ class TestIntegration(unittest.TestCase):
         """ Destroys the sample HTTP server for the test """
         self.__httpd.shutdown()
 
-    def __opener_open_redirect_to_local(self, original_self, url, data):
+    def __opener_open_redirect_to_local(self, original_self, url, data, timeout):
         """ Replaces the OpenerDirector.open function of URLLib, in order to redirect all requests
             to a local server.
             This way, we are still able to do the integration test with actual HTTP requests,
             though being handled by a local test HTTP server """
-        return self.__original_opener_open(original_self, "http://127.0.0.1:33327/" + url, data)
+        return self.__original_opener_open(original_self, "http://127.0.0.1:33327/" + url,
+                                           data, timeout)
 
     @staticmethod
     def __get_test_file(subpath):
