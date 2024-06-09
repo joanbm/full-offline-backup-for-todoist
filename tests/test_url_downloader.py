@@ -4,9 +4,9 @@
 import unittest
 import time
 from unittest.mock import patch
-from .test_util_static_http_request_handler import TestStaticHTTPServer
 from full_offline_backup_for_todoist.url_downloader import URLLibURLDownloader
 from full_offline_backup_for_todoist.tracer import NullTracer
+from .test_util_static_http_request_handler import TestStaticHTTPServer
 
 @patch.object(time, 'sleep', lambda secs: None) # For faster tests
 class TestFrontend(unittest.TestCase):

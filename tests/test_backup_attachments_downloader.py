@@ -6,7 +6,8 @@ from unittest.mock import MagicMock
 import io
 import csv
 import json
-from full_offline_backup_for_todoist.backup_attachments_downloader import TodoistBackupAttachmentsDownloader
+from full_offline_backup_for_todoist.backup_attachments_downloader import (
+    TodoistBackupAttachmentsDownloader)
 from full_offline_backup_for_todoist.tracer import NullTracer
 from .test_util_memory_vfs import InMemoryVfs
 
