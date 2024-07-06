@@ -32,7 +32,7 @@ Stable, but not tested under every possible scenario under the sun.
 
 ## Requirements
 
-* Python 3 (tested with Python 3.6.4+). No additional dependencies needed.
+* Python 3 (tested with Python 3.8+). No additional dependencies needed.
 
 ## Usage examples
 
