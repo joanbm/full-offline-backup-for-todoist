@@ -10,9 +10,9 @@ It is a utility that allows you to download a complete backup of your Todoist ta
 
 ## What is the main aim of this tool?
 
-With Todoist Premium, you can **attach files or photos to tasks as comments**, which is can be very convenient for everyday use, e.g. you can attach a photo of a bill to a task about paying it.
+With Todoist Premium, you can **attach files or photos to tasks as comments**, which can be very convenient for everyday use, e.g. you can attach a photo of a bill to a task about paying it.
 
-Furthermore, Todoist has a **backup functionality**, which allows exporting the task data to a local computer in the form of a ZIP file, e.g. for offline usage or in the event of an incident with Todoist servers.
+Furthermore, Todoist has a **backup functionality**, which allows exporting the task data to a local computer in the form of a ZIP file, e.g. for offline usage or in the event of an incident with Todoist's servers.
 
 Unfortunately, the two don't mix: **The backup functionality doesn't back up any of the attachments assigned to tasks**. Instead, only a URL to download the attachment is included in the backup, which isn't useful or ideal for most scenarios.
 
@@ -22,7 +22,7 @@ This tool aims to allow you to make a complete backup, including all attachments
 
 * Can download the backups from Todoist's servers through the Todoist API.
 
-* Can download all attachments of the tasks associated to your Todoist backup.
+* Can download all attachments of the tasks associated with your Todoist backup.
 
 * Can be easily automated to download your backups periodically.
 
