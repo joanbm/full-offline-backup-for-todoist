@@ -14,7 +14,7 @@ class TestTodoistApi(unittest.TestCase):
             an empty list of projects is returned """
         # Arrange
         mock_urldownloader = MagicMock()
-        mock_urldownloader.get.return_value = '{"projects": []}'.encode()
+        mock_urldownloader.get.return_value = b'{"projects": []}'
 
         # Act
         projects = TodoistApi("FAKE_TOKEN", NullTracer(), mock_urldownloader).get_projects()
@@ -28,10 +28,10 @@ class TestTodoistApi(unittest.TestCase):
 
         # Arrange
         mock_urldownloader = MagicMock()
-        mock_urldownloader.get.return_value = """{ "projects" : [
+        mock_urldownloader.get.return_value = b"""{ "projects" : [
             { "id" : 2181147711, "name" : "Not Work" },
             { "id" : 2181147713, "name" : "Work" }
-        ]}""".encode()
+        ]}"""
 
         todoist_api = TodoistApi("FAKE_TOKEN", NullTracer(), mock_urldownloader)
 
@@ -52,7 +52,7 @@ class TestTodoistApi(unittest.TestCase):
 
         # Arrange
         mock_urldownloader = MagicMock()
-        mock_urldownloader.get.return_value = '{"projects": []}'.encode()
+        mock_urldownloader.get.return_value = b'{"projects": []}'
 
         todoist_api = TodoistApi("FAKE TOKEN", NullTracer(), mock_urldownloader)
 
@@ -71,7 +71,7 @@ class TestTodoistApi(unittest.TestCase):
 
         # Arrange
         mock_urldownloader = MagicMock()
-        mock_urldownloader.get.return_value = "[".encode()
+        mock_urldownloader.get.return_value = b"["
 
         todoist_api = TodoistApi("FAKE_TOKEN", NullTracer(), mock_urldownloader)
 

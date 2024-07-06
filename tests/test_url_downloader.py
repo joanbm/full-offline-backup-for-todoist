@@ -20,9 +20,9 @@ class TestFrontend(unittest.TestCase):
         # Set up a quick and dirty HTTP server
         route_responses = {
             ("GET", "/sample.txt", None, None):
-                "this is a sample".encode(),
+                b"this is a sample",
             ("POST", "/sample.txt", b"param=value", None):
-                "this is a sample with a parameter".encode(),
+                b"this is a sample with a parameter",
         }
 
         self.__httpd = TestStaticHTTPServer(("127.0.0.1", 33327), route_responses)
