@@ -4,6 +4,7 @@
 import unittest
 import time
 import socket
+import sys
 from unittest.mock import patch
 from full_offline_backup_for_todoist.url_downloader import URLLibURLDownloader
 from full_offline_backup_for_todoist.tracer import NullTracer
@@ -84,4 +85,6 @@ class TestFrontend(unittest.TestCase):
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             s.bind(('127.0.0.1', 33329))
             s.listen()
-            self.assertRaises(TimeoutError, urldownloader.get, "http://127.0.0.1:33329")
+            # See https://docs.python.org/3/whatsnew/3.10.html#socket
+            exception = TimeoutError if sys.version_info >= (3, 10) else socket.timeout
+            self.assertRaises(exception, urldownloader.get, "http://127.0.0.1:33329")
