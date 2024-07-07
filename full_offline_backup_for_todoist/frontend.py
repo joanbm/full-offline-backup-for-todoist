@@ -91,7 +91,7 @@ class ConsoleFrontend:
             if deprecated_env in environment:
                 print(f"WARNING: The {deprecated_env} environment variable is no longer necessary")
 
-        token = get_credential(args.token_file, args.token, "TODOIST_TOKEN", "Todoist token" +
+        token = get_credential(args.token_file, args.token, "TODOIST_TOKEN", "Todoist token " +
                                "(from https://todoist.com/app/settings/integrations/developer)")
         return TodoistAuth(token)
 
