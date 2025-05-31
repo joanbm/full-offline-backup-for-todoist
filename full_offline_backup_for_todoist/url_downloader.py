@@ -12,6 +12,7 @@ NUM_RETRIES = 3
 class _Request(NamedTuple):
     url: str
     method: str
+    params: Optional[Dict[str, str]] = None
     data: Optional[Dict[str, str]] = None
 
 class URLDownloader(metaclass=ABCMeta):
@@ -33,10 +34,10 @@ class URLDownloader(metaclass=ABCMeta):
     def _download(self, request: _Request) -> bytes:
         """ Download the contents of the specified URL with the specified request. """
 
-    def get(self, url: str) -> bytes:
+    def get(self, url: str, params: Optional[Dict[str, str]] = None) -> bytes:
         """ Download the contents of the specified URL with a GET request.
             You can specify additional data to pass as URL query parameters. """
-        return self._download(_Request(url=url, method='GET'))
+        return self._download(_Request(url=url, method='GET', params=params))
 
     def post(self, url: str, data: Optional[Dict[str, str]] = None) -> bytes:
         """ Download the contents of the specified URL with a POST request.
@@ -47,8 +48,10 @@ class URLLibURLDownloader(URLDownloader):
     """ Implementation of a class to download the contents of an URL through URLLib """
 
     def _download_once(self, opener: urllib.request.OpenerDirector, request: _Request) -> bytes:
+        encoded_params = urllib.parse.urlencode(request.params) if request.params else None
+        encoded_url = f"{request.url}?{encoded_params}" if encoded_params else request.url
         encoded_data = urllib.parse.urlencode(request.data).encode() if request.data else None
-        with opener.open(request.url, encoded_data, self._timeout) as url_handle:
+        with opener.open(encoded_url, encoded_data, self._timeout) as url_handle:
             return cast(bytes, url_handle.read())
 
     def _download(self, request: _Request) -> bytes:

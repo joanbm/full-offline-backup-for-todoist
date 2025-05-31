@@ -21,6 +21,8 @@ class TestFrontend(unittest.TestCase):
         route_responses = {
             ("GET", "/sample.txt", None, None):
                 b"this is a sample",
+            ("GET", "/sample.txt?urlparam=yes", None, None):
+                b"this is a sample with query params",
             ("POST", "/sample.txt", b"param=value", None):
                 b"this is a sample with form data",
         }
@@ -55,6 +57,18 @@ class TestFrontend(unittest.TestCase):
 
         # Assert
         self.assertEqual(data.decode(), "this is a sample")
+
+    def test_urldownloader_can_pass_query_params(self):
+        """ Tests that the downloader can successfully download an existing file,
+            passing parameters in the URL """
+        # Arrange
+        urldownloader = URLLibURLDownloader(NullTracer())
+
+        # Act
+        data = urldownloader.get("http://127.0.0.1:33327/sample.txt", {'urlparam': 'yes'})
+
+        # Assert
+        self.assertEqual(data.decode(), "this is a sample with query params")
 
     def test_urldownloader_can_pass_form_data(self):
         """ Tests that the downloader can successfully download an existing file,
