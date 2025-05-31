@@ -14,7 +14,7 @@ class TestTodoistApi(unittest.TestCase):
             an empty list of projects is returned """
         # Arrange
         mock_urldownloader = MagicMock()
-        mock_urldownloader.get.return_value = b'{"projects": []}'
+        mock_urldownloader.post.return_value = b'{"projects": []}'
 
         # Act
         projects = TodoistApi("FAKE_TOKEN", NullTracer(), mock_urldownloader).get_projects()
@@ -28,7 +28,7 @@ class TestTodoistApi(unittest.TestCase):
 
         # Arrange
         mock_urldownloader = MagicMock()
-        mock_urldownloader.get.return_value = b"""{ "projects" : [
+        mock_urldownloader.post.return_value = b"""{ "projects" : [
             { "id" : 2181147711, "name" : "Not Work" },
             { "id" : 2181147713, "name" : "Work" }
         ]}"""
@@ -52,7 +52,7 @@ class TestTodoistApi(unittest.TestCase):
 
         # Arrange
         mock_urldownloader = MagicMock()
-        mock_urldownloader.get.return_value = b'{"projects": []}'
+        mock_urldownloader.post.return_value = b'{"projects": []}'
 
         todoist_api = TodoistApi("FAKE TOKEN", NullTracer(), mock_urldownloader)
 
@@ -61,7 +61,7 @@ class TestTodoistApi(unittest.TestCase):
 
         # Assert
         mock_urldownloader.set_bearer_token.assert_called_with('FAKE TOKEN')
-        mock_urldownloader.get.assert_called_with(ANY, {
+        mock_urldownloader.post.assert_called_with(ANY, {
             'sync_token': '*',
             'resource_types': '["projects"]'
         })
@@ -71,7 +71,7 @@ class TestTodoistApi(unittest.TestCase):
 
         # Arrange
         mock_urldownloader = MagicMock()
-        mock_urldownloader.get.return_value = b"["
+        mock_urldownloader.post.return_value = b"["
 
         todoist_api = TodoistApi("FAKE_TOKEN", NullTracer(), mock_urldownloader)
 
@@ -83,7 +83,7 @@ class TestTodoistApi(unittest.TestCase):
 
         # Arrange
         mock_urldownloader = MagicMock()
-        mock_urldownloader.get.side_effect = Exception('Test')
+        mock_urldownloader.post.side_effect = Exception('Test')
 
         todoist_api = TodoistApi("FAKE_TOKEN", NullTracer(), mock_urldownloader)
 

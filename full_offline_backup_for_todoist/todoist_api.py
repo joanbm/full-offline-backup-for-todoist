@@ -34,7 +34,7 @@ class TodoistApi:
     def get_projects(self) -> List[TodoistProjectInfo]:
         """ Obtains the list of all projects from the Todoist API """
         self.__tracer.trace("Fetching projects using the Todoist API...")
-        project_list_json = self.__urldownloader.get(
+        project_list_json = self.__urldownloader.post(
             self.__SYNC_ENDPOINT, {
                 "sync_token": '*',
                 "resource_types": '["projects"]',
@@ -51,7 +51,7 @@ class TodoistApi:
         self.__tracer.trace(f"Fetching project '{project.name}' (ID {project.identifier})"
             " as CSV using the Todoist API...")
 
-        return self.__urldownloader.get(
+        return self.__urldownloader.post(
             self.__EXPORT_PROJECT_AS_CSV_FILE_ENDPOINT, {
                 "project_id": project.identifier
             })

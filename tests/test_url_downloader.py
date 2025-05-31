@@ -22,7 +22,7 @@ class TestFrontend(unittest.TestCase):
             ("GET", "/sample.txt", None, None):
                 b"this is a sample",
             ("POST", "/sample.txt", b"param=value", None):
-                b"this is a sample with a parameter",
+                b"this is a sample with form data",
         }
 
         self.__httpd = TestStaticHTTPServer(("127.0.0.1", 33327), route_responses)
@@ -56,17 +56,17 @@ class TestFrontend(unittest.TestCase):
         # Assert
         self.assertEqual(data.decode(), "this is a sample")
 
-    def test_urldownloader_can_pass_request_params(self):
+    def test_urldownloader_can_pass_form_data(self):
         """ Tests that the downloader can successfully download an existing file,
-            passing parameters in the URL """
+            passing parameters in the request body as form data """
         # Arrange
         urldownloader = URLLibURLDownloader(NullTracer())
 
         # Act
-        data = urldownloader.get("http://127.0.0.1:33327/sample.txt", {'param': 'value'})
+        data = urldownloader.post("http://127.0.0.1:33327/sample.txt", {'param': 'value'})
 
         # Assert
-        self.assertEqual(data.decode(), "this is a sample with a parameter")
+        self.assertEqual(data.decode(), "this is a sample with form data")
 
     def test_urldownloader_throws_on_not_found(self):
         """ Tests that the downloader raises an exception on a non-existing file """

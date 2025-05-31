@@ -4,10 +4,15 @@ from abc import ABCMeta, abstractmethod
 import urllib.request
 import urllib.parse
 import time
-from typing import cast, Dict, Optional
+from typing import cast, Dict, Optional, NamedTuple
 from .tracer import Tracer
 
 NUM_RETRIES = 3
+
+class _Request(NamedTuple):
+    url: str
+    method: str
+    data: Optional[Dict[str, str]] = None
 
 class URLDownloader(metaclass=ABCMeta):
     """ Implementation of a class to download the contents of an URL """
@@ -25,31 +30,37 @@ class URLDownloader(metaclass=ABCMeta):
         self._bearer_token = bearer_token
 
     @abstractmethod
-    def get(self, url: str, data: Optional[Dict[str, str]]=None) -> bytes:
+    def _download(self, request: _Request) -> bytes:
+        """ Download the contents of the specified URL with the specified request. """
+
+    def get(self, url: str) -> bytes:
         """ Download the contents of the specified URL with a GET request.
-            You can specify any additional data parameters to pass to the destination. """
+            You can specify additional data to pass as URL query parameters. """
+        return self._download(_Request(url=url, method='GET'))
+
+    def post(self, url: str, data: Optional[Dict[str, str]] = None) -> bytes:
+        """ Download the contents of the specified URL with a POST request.
+            You can specify additional data to pass as a form-encoded body. """
+        return self._download(_Request(url=url, method='POST', data=data))
 
 class URLLibURLDownloader(URLDownloader):
     """ Implementation of a class to download the contents of an URL through URLLib """
 
-    def _download(self, opener: urllib.request.OpenerDirector, url: str,
-                  data: Optional[Dict[str, str]]=None) -> bytes:
-        """ Downloads the specified URL as bytes using the specified opener """
-        encoded_data = urllib.parse.urlencode(data).encode() if data else None
-        with opener.open(url, encoded_data, self._timeout) as url_handle:
+    def _download_once(self, opener: urllib.request.OpenerDirector, request: _Request) -> bytes:
+        encoded_data = urllib.parse.urlencode(request.data).encode() if request.data else None
+        with opener.open(request.url, encoded_data, self._timeout) as url_handle:
             return cast(bytes, url_handle.read())
 
-    def _download_with_retry(self, opener: urllib.request.OpenerDirector, url: str,
-                             data: Optional[Dict[str, str]]=None) -> bytes:
-        """ Downloads the specified URL as bytes using the specified opener, retrying on failure """
+    def _download(self, request: _Request) -> bytes:
+        opener = self._build_opener_with_app_useragent()
         for i in range(NUM_RETRIES):
             try:
-                return self._download(opener, url, data)
+                return self._download_once(opener, request)
             except urllib.error.URLError as exception:
                 self._tracer.trace(f"Got exception: {exception}, retrying...")
                 time.sleep(3**i)
 
-        return self._download(opener, url, data)
+        return self._download_once(opener, request)
 
     def _build_opener_with_app_useragent(
         self, *handlers: urllib.request.BaseHandler) -> urllib.request.OpenerDirector:
@@ -57,7 +68,3 @@ class URLLibURLDownloader(URLDownloader):
         opener.addheaders = ([('User-agent', 'full-offline-backup-for-todoist')] +
             ([('Authorization', 'Bearer ' + self._bearer_token)] if self._bearer_token else []))
         return opener
-
-    def get(self, url: str, data: Optional[Dict[str, str]]=None) -> bytes:
-        opener = self._build_opener_with_app_useragent()
-        return self._download_with_retry(opener, url, data)
