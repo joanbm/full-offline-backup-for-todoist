@@ -30,7 +30,7 @@ jobs:
           mypy --strict -m full_offline_backup_for_todoist
 
       - name: Run tests
-        run: coverage run -m unittest && coverage lcov
+        run: coverage run --source=full_offline_backup_for_todoist,tests -m unittest && coverage lcov
 
       - name: Upload coverage report
         if: ${{ matrix.python-version == '3.x' }}
