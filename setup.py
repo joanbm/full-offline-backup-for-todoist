@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 setup(
     name="full-offline-backup-for-todoist",
-    version="0.5.1",
+    version="0.5.2",
     packages=find_packages(exclude=("tests",)),
 
     author="Joan Bruguera Micó",
