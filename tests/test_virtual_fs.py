@@ -32,7 +32,7 @@ class Test(unittest.TestCase):
         # Arrange
         with ZipVirtualFs(None) as zvfs:
             # Act/Assert
-            self.assertRaises(Exception, zvfs.read_file, "non_existing.txt")
+            self.assertRaises(KeyError, zvfs.read_file, "non_existing.txt")
 
     def test_on_zip_vfs_write_new_is_written_and_can_be_read(self):
         """ Tests that a file can be written (and then read back) correctly """

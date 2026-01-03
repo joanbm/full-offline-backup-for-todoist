@@ -2,8 +2,10 @@
 """ Tests for the Todoist API wrapper """
 # pylint: disable=invalid-name
 import unittest
+import json
 from unittest.mock import MagicMock, ANY
 from full_offline_backup_for_todoist.todoist_api import TodoistApi
+from full_offline_backup_for_todoist.url_downloader import URLDownloaderException
 from full_offline_backup_for_todoist.tracer import NullTracer
 
 class TestTodoistApi(unittest.TestCase):
@@ -76,16 +78,16 @@ class TestTodoistApi(unittest.TestCase):
         todoist_api = TodoistApi("FAKE_TOKEN", NullTracer(), mock_urldownloader)
 
         # Act/Assert
-        self.assertRaises(Exception, todoist_api.get_projects)
+        self.assertRaises(json.decoder.JSONDecodeError, todoist_api.get_projects)
 
     def test_on_projects_http_fail_throws_exception(self):
         """ Tests that an exception is thrown on a HTTP error when using the Todoist API """
 
         # Arrange
         mock_urldownloader = MagicMock()
-        mock_urldownloader.post.side_effect = Exception('Test')
+        mock_urldownloader.post.side_effect = URLDownloaderException('Test')
 
         todoist_api = TodoistApi("FAKE_TOKEN", NullTracer(), mock_urldownloader)
 
         # Act/Assert
-        self.assertRaises(Exception, todoist_api.get_projects)
+        self.assertRaises(URLDownloaderException, todoist_api.get_projects)

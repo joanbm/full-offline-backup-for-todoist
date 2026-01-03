@@ -6,7 +6,7 @@ import time
 import socket
 import sys
 from unittest.mock import patch
-from full_offline_backup_for_todoist.url_downloader import URLLibURLDownloader
+from full_offline_backup_for_todoist.url_downloader import URLLibURLDownloader, URLDownloaderException
 from full_offline_backup_for_todoist.tracer import NullTracer
 from .test_util_static_http_request_handler import TestStaticHTTPServer
 
@@ -88,7 +88,7 @@ class TestFrontend(unittest.TestCase):
         urldownloader = URLLibURLDownloader(NullTracer())
 
         # Act/Assert
-        self.assertRaises(Exception, urldownloader.get, "http://127.0.0.1:33327/notfound.txt")
+        self.assertRaises(URLDownloaderException, urldownloader.get, "http://127.0.0.1:33327/notfound.txt")
 
     def test_urldownloader_throws_on_timeout(self):
         """ Tests that the downloader raises an exception on a non-existing file """
