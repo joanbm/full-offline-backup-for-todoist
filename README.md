@@ -46,6 +46,8 @@ To create a backup from Todoist's servers, including attachments, and with traci
 
 ``python3 -m full_offline_backup_for_todoist --verbose download --with-attachments``
 
+If you prefer relative dates in the CSV export (e.g. "in 259 days" instead of "November 29, 2026"), add `--use-relative-dates` to the end of your command.
+
 Print full help:
 
 ``python3 -m full_offline_backup_for_todoist -h``

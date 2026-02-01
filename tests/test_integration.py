@@ -31,19 +31,19 @@ class TestIntegration(unittest.TestCase):
         route_responses = {
             ("POST", "/https://api.todoist.com/api/v1/sync", b"sync_token=%2A&resource_types=%5B%22projects%22%5D", 'mysecrettoken'):
                 Path(self.__get_test_file("sources/project_list.json")).read_bytes(),
-            ("GET", "/https://api.todoist.com/api/v1/templates/file?project_id=2181147955", None, 'mysecrettoken'):
+            ("GET", "/https://api.todoist.com/api/v1/templates/file?project_id=2181147955&use_relative_dates=false", None, 'mysecrettoken'):
                 Path(self.__get_test_file("sources/Project_2181147955.csv")).read_bytes(),
-            ("GET", "/https://api.todoist.com/api/v1/templates/file?project_id=2181147714", None, 'mysecrettoken'):
+            ("GET", "/https://api.todoist.com/api/v1/templates/file?project_id=2181147714&use_relative_dates=false", None, 'mysecrettoken'):
                 Path(self.__get_test_file("sources/Project_2181147714.csv")).read_bytes(),
-            ("GET", "/https://api.todoist.com/api/v1/templates/file?project_id=2181147709", None, 'mysecrettoken'):
+            ("GET", "/https://api.todoist.com/api/v1/templates/file?project_id=2181147709&use_relative_dates=false", None, 'mysecrettoken'):
                 Path(self.__get_test_file("sources/Project_2181147709.csv")).read_bytes(),
-            ("GET", "/https://api.todoist.com/api/v1/templates/file?project_id=2181147715", None, 'mysecrettoken'):
+            ("GET", "/https://api.todoist.com/api/v1/templates/file?project_id=2181147715&use_relative_dates=false", None, 'mysecrettoken'):
                 Path(self.__get_test_file("sources/Project_2181147715.csv")).read_bytes(),
-            ("GET", "/https://api.todoist.com/api/v1/templates/file?project_id=2181147711", None, 'mysecrettoken'):
+            ("GET", "/https://api.todoist.com/api/v1/templates/file?project_id=2181147711&use_relative_dates=false", None, 'mysecrettoken'):
                 Path(self.__get_test_file("sources/Project_2181147711.csv")).read_bytes(),
-            ("GET", "/https://api.todoist.com/api/v1/templates/file?project_id=2181147712", None, 'mysecrettoken'):
+            ("GET", "/https://api.todoist.com/api/v1/templates/file?project_id=2181147712&use_relative_dates=false", None, 'mysecrettoken'):
                 Path(self.__get_test_file("sources/Project_2181147712.csv")).read_bytes(),
-            ("GET", "/https://api.todoist.com/api/v1/templates/file?project_id=2181147713", None, 'mysecrettoken'):
+            ("GET", "/https://api.todoist.com/api/v1/templates/file?project_id=2181147713&use_relative_dates=false", None, 'mysecrettoken'):
                 Path(self.__get_test_file("sources/Project_2181147713.csv")).read_bytes(),
             ("GET", "/https://d1x0mwiac2rqwt.cloudfront.net/g75-kL8pwVYNObSczLnVXe4FIyJd8YQL6b8yCilGyix09bMdJmxbtrGMW9jIeIwJ/by/16542905/as/bug.txt", None, None):
                 Path(self.__get_test_file("sources/bug.txt")).read_bytes(),
