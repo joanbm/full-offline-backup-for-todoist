@@ -25,11 +25,14 @@ class TodoistApi:
 
     __tracer: Tracer
     __urldownloader: URLDownloader
+    __use_relative_dates: bool
 
-    def __init__(self, api_token: str, tracer: Tracer, urldownloader: URLDownloader):
+    def __init__(self, api_token: str, tracer: Tracer, urldownloader: URLDownloader,
+                 use_relative_dates: bool = False):
         self.__tracer = tracer
         self.__urldownloader = urldownloader
         self.__urldownloader.set_bearer_token(api_token)
+        self.__use_relative_dates = use_relative_dates
 
     def get_projects(self) -> List[TodoistProjectInfo]:
         """ Obtains the list of all projects from the Todoist API """
@@ -53,5 +56,6 @@ class TodoistApi:
 
         return self.__urldownloader.get(
             self.__TEMPLATES_CSV_FILE_ENDPOINT, {
-                "project_id": project.identifier
+                "project_id": project.identifier,
+                "use_relative_dates": str(self.__use_relative_dates).lower(),
             })
