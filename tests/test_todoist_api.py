@@ -4,7 +4,7 @@
 import unittest
 import json
 from unittest.mock import MagicMock, ANY
-from full_offline_backup_for_todoist.todoist_api import TodoistApi
+from full_offline_backup_for_todoist.todoist_api import TodoistApi, TodoistProjectInfo
 from full_offline_backup_for_todoist.url_downloader import URLDownloaderException
 from full_offline_backup_for_todoist.tracer import NullTracer
 
@@ -91,3 +91,28 @@ class TestTodoistApi(unittest.TestCase):
 
         # Act/Assert
         self.assertRaises(URLDownloaderException, todoist_api.get_projects)
+
+    def test_export_project_csv_passes_relative_dates_flag(self):
+        """ Tests that relative dates flag is passed to the export endpoint """
+        # Arrange
+        mock_urldownloader = MagicMock()
+        mock_urldownloader.get.return_value = b"csv-data"
+        project = TodoistProjectInfo("Work", 123)
+
+        # Act
+        TodoistApi("FAKE_TOKEN", NullTracer(), mock_urldownloader, False).export_project_as_csv(
+            project
+        )
+        TodoistApi("FAKE_TOKEN", NullTracer(), mock_urldownloader, True).export_project_as_csv(
+            project
+        )
+
+        # Assert
+        mock_urldownloader.get.assert_any_call(ANY, {
+            "project_id": 123,
+            "use_relative_dates": "false",
+        })
+        mock_urldownloader.get.assert_any_call(ANY, {
+            "project_id": 123,
+            "use_relative_dates": "true",
+        })

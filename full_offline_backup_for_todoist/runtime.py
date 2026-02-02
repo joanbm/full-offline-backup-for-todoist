@@ -11,10 +11,10 @@ from .url_downloader import URLLibURLDownloader
 class RuntimeControllerDependencyInjector(ControllerDependencyInjector):
     """ Implementation of the dependency injection container for the actual runtime objects """
 
-    def __init__(self, auth: TodoistAuth, verbose: bool):
+    def __init__(self, auth: TodoistAuth, verbose: bool, use_relative_dates: bool):
         self.__tracer = ConsoleTracer() if verbose else NullTracer()
         urldownloader = URLLibURLDownloader(self.__tracer)
-        todoist_api = TodoistApi(auth.token, self.__tracer, urldownloader)
+        todoist_api = TodoistApi(auth.token, self.__tracer, urldownloader, use_relative_dates)
         self.__backup_downloader = TodoistBackupDownloader(self.__tracer, todoist_api)
         self.__backup_attachments_downloader = TodoistBackupAttachmentsDownloader(
             self.__tracer, urldownloader)

@@ -12,7 +12,7 @@ from .controller import TodoistAuth, Controller, ControllerDependencyInjector
 class ConsoleFrontend:
     """ Implementation of the console frontend for the Todoist backup tool """
     def __init__(self, controller_factory: Callable[[ControllerDependencyInjector], Controller],
-                 controller_dependencies_factory: Callable[[TodoistAuth, bool],
+                 controller_dependencies_factory: Callable[[TodoistAuth, bool, bool],
                                                            ControllerDependencyInjector]):
         self.__controller_factory = controller_factory
         self.__controller_dependencies_factory = controller_dependencies_factory
@@ -46,6 +46,8 @@ class ConsoleFrontend:
                                      help="download attachments and attach to the backup file")
         parser_download.add_argument("--output-file", type=str,
                                      help="name of the file that will store the backup")
+        parser_download.add_argument("--use-relative-dates", action="store_true",
+                                     help="export dates as relative (e.g. 'in 12 days') in CSV")
         self.__add_authorization_group(parser_download)
 
         return parser.parse_args(arguments)
@@ -100,7 +102,8 @@ class ConsoleFrontend:
 
         # Configure controller
         auth = self.__get_auth(args, environment)
-        dependencies = self.__controller_dependencies_factory(auth, args.verbose)
+        dependencies = self.__controller_dependencies_factory(
+            auth, args.verbose, args.use_relative_dates)
         controller = self.__controller_factory(dependencies)
 
         # Setup zip virtual fs
